@@ -23,7 +23,7 @@
     "start": "snowpack dev",
     "build": "tsc --project tsconfig.build.json",
     "test": "web-test-runner \"src/**/*.test.ts\"",
-    "publish": "npm build & npm publish dist"
+    "publish": "npm run build & npm publish dist"
   },
   "dependencies": {
   },

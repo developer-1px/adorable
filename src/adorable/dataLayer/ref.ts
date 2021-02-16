@@ -47,12 +47,8 @@ export function reducer<T>(value:T|undefined, path:string, callback:ReducerCallb
   const ref$ = ref(value, path)
   let destroyCallback:Function|void
 
-  try {
-    destroyCallback = callback(ref$)
-  }
-  catch (e) {
-    Promise.resolve().then(() => destroyCallback = callback(ref$))
-  }
+  try {destroyCallback = callback(ref$)}
+  catch (e) {Promise.resolve().then(() => destroyCallback = callback(ref$))}
 
   return memo2[path] = ref$
 }
