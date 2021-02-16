@@ -1,8 +1,12 @@
 {
   "name": "adorable",
-  "description": "> ✨ Observable based state Management Library",
-  "version": "1.0.0",
-  "main": "/src/adorable",
+  "description": "action dispatch on reducer / Observable based State Management Library",
+  "version": "0.0.7",
+  "main": "/dist/index.js",
+  "types": "/dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/developer-1px/adorable.git"
@@ -14,16 +18,17 @@
     "rxjs"
   ],
   "author": "teo.yu",
-  "license": "ISC",
+  "license": "MIT",
   "scripts": {
     "start": "snowpack dev",
-    "build": "snowpack build",
-    "test": "web-test-runner \"src/**/*.test.ts\""
+    "build": "tsc --project tsconfig.build.json",
+    "test": "web-test-runner \"src/**/*.test.ts\"",
+    "publish": "npm build & npm publish dist"
   },
   "dependencies": {
-    "svelte": "^3.24.0"
   },
   "devDependencies": {
+    "svelte": "^3.24.0",
     "@snowpack/plugin-dotenv": "^2.0.5",
     "@snowpack/plugin-svelte": "^3.5.0",
     "@snowpack/plugin-typescript": "^1.2.0",

@@ -24,7 +24,7 @@ export const on = <T>(...type:OnAble<T>[]):Observable<T> => Observable.merge(...
 
 
 /// dispatch
-const makeAction = <T>(type:string, payload:T) => {
+const makeAction = <T>(type:any, payload:T) => {
   if (Array.isArray(type)) [type, payload] = type
   return [type.toString(), payload]
 }
@@ -33,7 +33,7 @@ const next = <T>(type:string, payload:T) => (actions$.next([type, payload]), pay
 
 let index = 0
 
-const _dispatch = <T>(type:string, payload:T):T => {
+const _dispatch = <T>(type:string, payload?:T):T|undefined => {
 
   const hasLog = type && type.charAt(0) !== "#"
 
@@ -149,6 +149,7 @@ Observable.prototype.dispatch = function <T>(type:Action<T>|SingleActionCreator<
 
   // case3. 	.dispatch(학습진도현황_조회하기.REQUEST, account => aicms.retrieveMypageInfo(account.email))
   if (arguments.length === 2 && typeof payload === "function") {
+    // @ts-ignore
     return this.map(payload).mergeMap(payload => dispatch(type, payload)).createEffect()
   }
 
