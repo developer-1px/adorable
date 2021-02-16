@@ -1,0 +1,17 @@
+{
+  "include": ["src/adorable"],
+  "compilerOptions": {
+    "outDir": "dist",
+    "declaration": true,
+    "module": "es6",
+    "target": "es6",
+    "moduleResolution": "node",
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "useDefineForClassFields": true,
+    "allowSyntheticDefaultImports": true,
+    "importsNotUsedAsValues": "error"
+  }
+}
