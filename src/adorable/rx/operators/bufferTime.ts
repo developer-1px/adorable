@@ -27,7 +27,7 @@ export const bufferTime = <T>(duration:number) => lift<T, T[]>(observer => {
 
 declare module "../observable/observable" {
   interface Observable<T> {
-    bufferTime(duration:number):Observable<T>
+    bufferTime(duration:number):Observable<T[]>
   }
 }
 
