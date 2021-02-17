@@ -6,7 +6,7 @@ const makeFunction = (f:any):Function => typeof f === "function" ? f : noop
 
 export const tap = <T>(onNext:((value:T, index:number) => void)|null = noop, onError:OnError|null = noop, onComplete:OnComplete|null = noop) => lift<T, T>(observer => {
   const _onNext = makeFunction(onNext)
-  const _onError = makeFunction(onNext)
+  const _onError = makeFunction(onError)
   const _onComplete = makeFunction(onComplete)
 
   let index = 0
