@@ -1,5 +1,5 @@
-import {Observable} from "../observable/observable"
 import {lift} from "../internal/lift"
+import {Observable} from "../observable/observable"
 
 export const mapTo = <T, R>(value:R) => lift<T, R>(observer => {
   return {
@@ -10,9 +10,9 @@ export const mapTo = <T, R>(value:R) => lift<T, R>(observer => {
 })
 
 declare module "../observable/observable" {
-  interface Observable<T> {
+  interface Observable {
     mapTo<R>(value:R):Observable<R>
   }
 }
 
-Observable.prototype.mapTo = function(...args) { return mapTo(...args)(this) }
+Observable.prototype.mapTo = function(...args) {return mapTo(...args)(this)}

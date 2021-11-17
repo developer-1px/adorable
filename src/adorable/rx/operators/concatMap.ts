@@ -1,6 +1,6 @@
-import {Observable, Subscription} from "../observable/observable"
 import {lift} from "../internal/lift"
-import type {Asyncable} from "../operator/castAsync"
+import {Observable, Subscription} from "../observable/observable"
+import type {Asyncable} from "../types"
 
 export const concatMap = <T, R>(project:(value:T, index:number) => Asyncable<R>) => lift<T, R>(observer => {
 
@@ -20,7 +20,7 @@ export const concatMap = <T, R>(project:(value:T, index:number) => Asyncable<R>)
     const observable = Observable.castAsync(project(value, index++))
 
     let completed = false
-    const concatMapObserver = Object.setPrototypeOf({complete: () => completed = true}, observer)
+    const concatMapObserver = Object.setPrototypeOf({complete: () => (completed = true)}, observer)
 
     const subscription = observable
       .finalize(() => {
@@ -47,7 +47,7 @@ export const concatMap = <T, R>(project:(value:T, index:number) => Asyncable<R>)
   }
 
   return {
-    next(value) {
+    next(value:T) {
       queue.push(value)
       doQueue()
     },
@@ -59,7 +59,7 @@ export const concatMap = <T, R>(project:(value:T, index:number) => Asyncable<R>)
       }
     },
 
-    finalize() {
+    cleanup() {
       for (const subscription of subscriptions) subscription.unsubscribe()
     }
   }
@@ -72,4 +72,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.concatMap = function() { return concatMap(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.concatMap = function() {return concatMap(...arguments)(this)}

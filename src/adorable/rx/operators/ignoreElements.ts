@@ -1,5 +1,5 @@
-import {Observable} from "../observable/observable"
 import {lift} from "../internal/lift"
+import {Observable} from "../observable/observable"
 
 export const ignoreElements = <T>() => lift<T, T>(() => ({next() {}}))
 
@@ -10,4 +10,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.ignoreElements = function() { return ignoreElements(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.ignoreElements = function() {return ignoreElements(...arguments)(this)}

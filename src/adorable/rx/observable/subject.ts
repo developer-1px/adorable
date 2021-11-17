@@ -1,5 +1,6 @@
 /// Subject
-import {Observable, Observer, Subscriber, SubscriptionObserver} from "./observable"
+import type {Observer, Subscriber} from "../types"
+import {Observable, SubscriptionObserver} from "./observable"
 
 const noop = () => {}
 
@@ -18,7 +19,7 @@ class MulticastedObservables<T> extends Observable<T> implements Observer<T> {
     })
   }
 
-  get closed() { return this.observers === undefined }
+  get closed() {return this.observers === undefined}
 
   next(value?:T) {
     if (!this.observers) return
@@ -49,6 +50,7 @@ export class BehaviorSubject<T> extends MulticastedObservables<T> {
 
   constructor(value?:T) {
     super(observer => {
+      // eslint-disable-next-line no-prototype-builtins
       if (this.hasOwnProperty("value")) {
         observer.next(this.value)
       }

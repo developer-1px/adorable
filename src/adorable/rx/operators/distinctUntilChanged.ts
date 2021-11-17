@@ -1,5 +1,5 @@
-import {Observable} from "../observable/observable"
 import {lift} from "../internal/lift"
+import {Observable} from "../observable/observable"
 
 export const distinctUntilChanged = <T>(compare:(prev:T, curr:T) => boolean = Object.is) => lift<T, T>(observer => {
   let prev:T
@@ -17,4 +17,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.distinctUntilChanged = function() { return distinctUntilChanged(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.distinctUntilChanged = function() {return distinctUntilChanged(...arguments)(this)}

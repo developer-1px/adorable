@@ -1,5 +1,5 @@
-import {Observable} from "../observable/observable"
 import {lift} from "../internal/lift"
+import {Observable} from "../observable/observable"
 
 export const trace = <T>(...tag:string[]) => {
   // const stack = (new Error).stack?.split(" at ") || []
@@ -9,14 +9,14 @@ export const trace = <T>(...tag:string[]) => {
     let prev:T
 
     return {
-      next(value) {
+      next(value:T) {
         // @ts-ignore
         console.log(...tag.map(tag => "\x1b[35m " + `${tag}`), prev, "→", value)
         observer.next(value)
         prev = value
       },
 
-      error(error) {
+      error(error:any) {
         console.error(...tag, error)
         observer.error(error)
       }
@@ -31,4 +31,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.trace = function() { return trace(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.trace = function() {return trace(...arguments)(this)}

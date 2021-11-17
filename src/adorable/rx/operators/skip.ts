@@ -10,4 +10,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.skip = function() { return skip(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.skip = function() {return skip(...arguments)(this)}

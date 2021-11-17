@@ -1,7 +1,7 @@
-import {Observable, Observer} from "../observable/observable"
+import {Observable} from "../observable/observable"
 
 export const initialize = <T>(initialize:(value:T) => void) => (observable:Observable<T>) => new Observable(observer => {
-  const o:Observer<T> = Object.setPrototypeOf({
+  const o = Object.setPrototypeOf({
     next(value:T) {
       initialize(value)
       observer.next(value)
@@ -19,4 +19,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.initialize = function() { return initialize(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.initialize = function() {return initialize(...arguments)(this)}

@@ -1,14 +1,16 @@
-import {Observable, Subscription} from "../observable/observable"
 import {lift} from "../internal/lift"
+import {Observable, Subscription} from "../observable/observable"
+import {castAsync} from "../operator/castAsync"
+import type {Asyncable} from "../types"
 
-export const delayWhen = <T>(delayDurationSelector:(value:T, index:number) => Observable<any>) => lift<T, T>(observer => {
+export const delayWhen = <T>(delayDurationSelector:(value:T, index:number) => Asyncable<any>) => lift<T, T>(observer => {
   let index = 0
   let completed = false
   let subscriptions:Subscription[] = []
 
   return {
-    next(value) {
-      const s = delayDurationSelector(value, index++).subscribe(() => {
+    next(value:T) {
+      const s = castAsync(delayDurationSelector(value, index++)).subscribe(() => {
         observer.next(value)
         if (completed) observer.complete()
         s.unsubscribe()
@@ -21,7 +23,7 @@ export const delayWhen = <T>(delayDurationSelector:(value:T, index:number) => Ob
       completed = true
     },
 
-    finalize() {
+    cleanup() {
       for (const s of subscriptions) s.unsubscribe()
     }
   }
@@ -29,9 +31,10 @@ export const delayWhen = <T>(delayDurationSelector:(value:T, index:number) => Ob
 
 declare module "../observable/observable" {
   interface Observable<T> {
-    delayWhen<T>(delayTime:number):Observable<T>
+    delayWhen(delayDurationSelector:(value:T, index:number) => Asyncable<any>):Observable<T>
   }
 }
 
 // @ts-ignore
-Observable.prototype.delayWhen = function() { return delayWhen(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.delayWhen = function() {return delayWhen(...arguments)(this)}

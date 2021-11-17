@@ -1,10 +1,10 @@
-import {Observable} from "../observable/observable"
 import {lift} from "../internal/lift"
+import {Observable} from "../observable/observable"
 
 export const count = <T>() => lift<T, number>(observer => {
   let count = 0
   return {
-    next(value) {count++},
+    next() {count++},
     complete() {
       observer.next(count)
       observer.complete()
@@ -13,10 +13,11 @@ export const count = <T>() => lift<T, number>(observer => {
 })
 
 declare module "../observable/observable" {
-  interface Observable<T> {
+  interface Observable {
     count():Observable<number>
   }
 }
 
 // @ts-ignore
-Observable.prototype.count = function() { return count(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.count = function() {return count(...arguments)(this)}

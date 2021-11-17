@@ -1,10 +1,10 @@
-import {Observable} from "../observable/observable"
 import {lift} from "../internal/lift"
+import {Observable} from "../observable/observable"
 
 export const takeLast = <T>(count:number) => lift<T, T[]>(observer => {
   let history:T[] = []
   return {
-    next(value) {
+    next(value:T) {
       history.push(value)
       history = history.slice(-count)
     },
@@ -14,7 +14,7 @@ export const takeLast = <T>(count:number) => lift<T, T[]>(observer => {
       observer.complete()
     },
 
-    finalize() {
+    cleanup() {
       history = []
     }
   }
@@ -27,4 +27,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.takeLast = function() { return takeLast(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.takeLast = function() {return takeLast(...arguments)(this)}

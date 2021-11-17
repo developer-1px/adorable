@@ -1,7 +1,7 @@
 import {Observable} from "../observable/observable"
 
-export const toPromise = <T>() => (observable: Observable<T>) => new Promise<T>((resolve, reject) => {
-  observable.subscribe(resolve, reject)
+export const toPromise = <T>() => (observable:Observable<T>) => new Promise<T>((resolve, reject) => {
+  observable.take(1).subscribe(resolve, reject)
 })
 
 declare module "../observable/observable" {
@@ -11,4 +11,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.toPromise = function() { return toPromise(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.toPromise = function() {return toPromise(...arguments)(this)}

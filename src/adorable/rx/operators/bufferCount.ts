@@ -1,11 +1,11 @@
-import {Observable} from "../observable/observable"
 import {lift} from "../internal/lift"
+import {Observable} from "../observable/observable"
 
 export const bufferCount = <T>(bufferSize:number, startBufferEvery:number = bufferSize) => lift<T, T[]>(observer => {
   let buffer:T[] = []
 
   return {
-    next(value) {
+    next(value:T) {
       buffer.push(value)
       if (buffer.length === bufferSize) {
         observer.next(buffer)
@@ -13,9 +13,8 @@ export const bufferCount = <T>(bufferSize:number, startBufferEvery:number = buff
       }
     },
 
-    finalize() {
-      // @ts-ignore
-      buffer = null
+    cleanup() {
+      buffer = []
     }
   }
 })
@@ -27,4 +26,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.bufferCount = function() { return bufferCount(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.bufferCount = function() {return bufferCount(...arguments)(this)}

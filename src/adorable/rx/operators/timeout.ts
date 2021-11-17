@@ -1,21 +1,21 @@
-import {Observable} from "../observable/observable"
 import {lift} from "../internal/lift"
+import {Observable} from "../observable/observable"
 
 export const timeout = <T>(due:number) => lift<T, T>(observer => {
-  let id:NodeJS.Timeout
+  let id:ReturnType<typeof setTimeout>
   return {
     start() {
       clearTimeout(id)
       id = setTimeout(() => observer.error(), due)
     },
 
-    next(value) {
+    next(value:T) {
       clearTimeout(id)
       id = setTimeout(() => observer.error(value), due)
       observer.next(value)
     },
 
-    finalize() {
+    cleanup() {
       clearTimeout(id)
     }
   }
@@ -28,4 +28,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.timeout = function() { return timeout(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.timeout = function() {return timeout(...arguments)(this)}

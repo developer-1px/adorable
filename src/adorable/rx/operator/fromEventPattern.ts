@@ -7,7 +7,7 @@ export function fromEventPattern<T>(addHandler:EventHandler, removeHandler:Event
     const handler = observer.next.bind(observer)
     addHandler(handler)
     return () => removeHandler(handler)
-  })//.share()
+  })// .share()
 }
 
 declare module "../observable/observable" {

@@ -1,7 +1,7 @@
 import {Observable} from "../observable/observable"
-import {last} from "../operators/last";
+import {last} from "../operators/last"
 
-export const forkjoin = <T>(...observables: Observable<T>[]) => new Observable<T[]>(observer => {
+export const forkjoin = <T>(...observables:Observable<T>[]) => new Observable<T[]>(observer => {
   let count = 0
   const ret = new Array(observables.length)
 
@@ -26,7 +26,7 @@ export const forkjoin = <T>(...observables: Observable<T>[]) => new Observable<T
 
 declare module "../observable/observable" {
   namespace Observable {
-    export function forkjoin<T>(...observables: Observable<T>[]): Observable<T[]>
+    export function forkjoin<T>(...observables:Observable<T>[]):Observable<T[]>
   }
 }
 

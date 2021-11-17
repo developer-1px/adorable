@@ -1,6 +1,3 @@
-// -------------------------------------------------------------------------------------------
-// Observable.timer
-// -------------------------------------------------------------------------------------------
 import {Observable} from "../observable/observable"
 
 export const merge = <T>(...observables:Observable<T>[]) => new Observable<T>(observer => {
@@ -15,7 +12,7 @@ export const merge = <T>(...observables:Observable<T>[]) => new Observable<T>(ob
     }
   }, observer)
 
-  const subscriptions = observables.map(observable => observable && observable.subscribe(mergeObserver))
+  const subscriptions = observables.map(observable => observable.subscribe(mergeObserver))
 
   return () => {
     for (const s of subscriptions) s.unsubscribe()

@@ -1,22 +1,23 @@
-import {Observable, OnComplete, OnError} from "../observable/observable"
 import {lift} from "../internal/lift"
+import {Observable} from "../observable/observable"
+import type {OnComplete, OnError} from "../types"
 
 const noop = () => {}
-const makeFunction = (f:any):Function => typeof f === "function" ? f : noop
+const castFunction = (f:any):Function => typeof f === "function" ? f : noop
 
 export const tap = <T>(onNext:((value:T, index:number) => void)|null = noop, onError:OnError|null = noop, onComplete:OnComplete|null = noop) => lift<T, T>(observer => {
-  const _onNext = makeFunction(onNext)
-  const _onError = makeFunction(onError)
-  const _onComplete = makeFunction(onComplete)
+  const _onNext = castFunction(onNext)
+  const _onError = castFunction(onError)
+  const _onComplete = castFunction(onComplete)
 
   let index = 0
   return {
-    next(value) {
+    next(value:T) {
       _onNext(value, index++)
       observer.next(value)
     },
 
-    error(error) {
+    error(error:any) {
       _onError(error)
       observer.error(error)
     },
@@ -35,4 +36,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.tap = function() { return tap(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.tap = function() {return tap(...arguments)(this)}

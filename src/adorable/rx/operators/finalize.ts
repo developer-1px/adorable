@@ -1,7 +1,7 @@
-import {Observable} from "../observable/observable"
 import {lift} from "../internal/lift"
+import {Observable} from "../observable/observable"
 
-export const finalize = <T>(finalize:() => void) => lift<T, T>(observer => ({finalize}))
+export const finalize = <T>(finalize:() => void) => lift<T, T>(() => ({cleanup: finalize}))
 
 declare module "../observable/observable" {
   interface Observable<T> {
@@ -10,4 +10,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.finalize = function() { return finalize(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.finalize = function() {return finalize(...arguments)(this)}

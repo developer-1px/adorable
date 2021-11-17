@@ -1,14 +1,7 @@
-import {Observable, Observer, OnComplete, OnError, OnNext} from "../observable/observable"
-import {fromPromise} from "./fromPromise"
+import {Observable} from "../observable/observable"
+import type {Asyncable, Defer, ObservableLike} from "../types"
 import {defer} from "./defer"
-
-interface ObservableLike<T> {
-  subscribe(observer:Observer<T>):any
-  subscribe(next?:OnNext<T>, error?:OnError, complete?:OnComplete):any
-}
-
-export type Defer<T> = <T>(...args:any[]) => Asyncable<T>
-export type Asyncable<T> = Observable<T>|Promise<T>|Defer<T>|ObservableLike<T>|PromiseLike<T>|T
+import {fromPromise} from "./fromPromise"
 
 const thenable = <T>(value:Asyncable<T>):value is PromiseLike<T> => value && typeof value === "object" && "then" in value && typeof value.then === "function"
 const subscribable = <T>(value:Asyncable<T>):value is ObservableLike<T> => value && typeof value === "object" && "subscribe" in value && typeof value.subscribe === "function"

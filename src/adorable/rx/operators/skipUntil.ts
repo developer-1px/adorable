@@ -1,5 +1,5 @@
-import {Observable} from "../observable/observable"
 import {lift} from "../internal/lift"
+import {Observable} from "../observable/observable"
 import {take} from "./take"
 
 export const skipUntil = <T>(notifier:Observable<any>) => lift<T, T>(observer => {
@@ -9,7 +9,7 @@ export const skipUntil = <T>(notifier:Observable<any>) => lift<T, T>(observer =>
       notifier.pipe(take(1)).subscribe(() => hasValue = true)
     },
 
-    next(value) {
+    next(value:T) {
       if (!hasValue) return
       observer.next(value)
     }
@@ -23,4 +23,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.skipUntil = function() { return skipUntil(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.skipUntil = function() {return skipUntil(...arguments)(this)}

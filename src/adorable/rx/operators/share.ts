@@ -8,10 +8,10 @@ export const share = <T>() => (observable:Observable<T>) => {
     observers.push(observer)
 
     subscription = subscription || observable.subscribe({
-      next(value) {
+      next(value:T) {
         for (const observer of observers) observer.next(value)
       },
-      error(error) {
+      error(error:any) {
         for (const observer of observers) observer.error(error)
       },
       complete() {
@@ -36,4 +36,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.share = function() { return share(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.share = function() {return share(...arguments)(this)}

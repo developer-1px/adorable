@@ -1,6 +1,6 @@
 import {Observable} from "../observable/observable"
-import {delayWhen} from "./delayWhen"
 import {timer} from "../operator/timer"
+import {delayWhen} from "./delayWhen"
 
 export const delay = <T>(delayTime:number) => delayWhen<T>(() => timer(delayTime))
 
@@ -11,4 +11,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.delay = function() { return delay(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.delay = function() {return delay(...arguments)(this)}

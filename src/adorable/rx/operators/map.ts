@@ -1,10 +1,10 @@
-import {Observable} from "../observable/observable"
 import {lift} from "../internal/lift"
+import {Observable} from "../observable/observable"
 
 export const map = <T, R>(project:(value:T, index:number) => R) => lift<T, R>(observer => {
   let index = 0
   return {
-    next(value) {
+    next(value:T) {
       observer.next(project(value, index++))
     }
   }
@@ -17,4 +17,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.map = function() { return map(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.map = function() {return map(...arguments)(this)}

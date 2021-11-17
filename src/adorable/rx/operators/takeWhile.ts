@@ -1,5 +1,5 @@
-import {Observable} from "../observable/observable"
 import {lift} from "../internal/lift"
+import {Observable} from "../observable/observable"
 
 // @TODO: inclusive
 export const takeWhile = <T>(predicate:(value:T, index:number) => boolean) => lift<T, T>(observer => {
@@ -23,4 +23,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.takeWhile = function() { return takeWhile(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.takeWhile = function() {return takeWhile(...arguments)(this)}

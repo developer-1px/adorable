@@ -1,5 +1,5 @@
-import {Observable, Subscription} from "../observable/observable"
 import {lift} from "../internal/lift"
+import {Observable, Subscription} from "../observable/observable"
 import {take} from "./take"
 
 export const throttle = <T>(durationSelector:(...args:any[]) => Observable<any>) => lift<T, T>(observer => {
@@ -33,10 +33,8 @@ export const throttle = <T>(durationSelector:(...args:any[]) => Observable<any>)
   //   emitValue = value
   // }
 
-  const ret = {next, finalize() { s && s.unsubscribe()}}
-  return ret
+  return {next, cleanup() {s && s.unsubscribe()}}
 })
-
 
 
 declare module "../observable/observable" {
@@ -46,4 +44,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.throttle = function() { return throttle(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.throttle = function() {return throttle(...arguments)(this)}

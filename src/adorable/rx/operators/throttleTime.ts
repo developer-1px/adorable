@@ -1,6 +1,6 @@
 import {Observable} from "../observable/observable"
-import {throttle} from "./throttle"
 import {timer} from "../operator/timer"
+import {throttle} from "./throttle"
 
 export const throttleTime = (duration:number) => throttle(() => timer(duration, duration))
 
@@ -11,4 +11,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.throttleTime = function() { return throttleTime(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.throttleTime = function() {return throttleTime(...arguments)(this)}

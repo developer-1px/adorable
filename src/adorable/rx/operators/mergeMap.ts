@@ -1,6 +1,6 @@
-import {Observable, Subscription} from "../observable/observable"
 import {lift} from "../internal/lift"
-import type {Asyncable} from "../operator/castAsync"
+import {Observable, Subscription} from "../observable/observable"
+import type {Asyncable} from "../types"
 
 export const mergeMap = <T, R>(project:(value:T, index:number) => Asyncable<R>) => lift<T, R>((observer) => {
   let index = 0
@@ -11,7 +11,7 @@ export const mergeMap = <T, R>(project:(value:T, index:number) => Asyncable<R>) 
   const mergeMapObserver = Object.setPrototypeOf({complete}, observer)
 
   return {
-    next(value) {
+    next(value:T) {
       subscriptions.push(Observable.castAsync(project(value, index++)).subscribe(mergeMapObserver))
     },
 
@@ -20,12 +20,11 @@ export const mergeMap = <T, R>(project:(value:T, index:number) => Asyncable<R>) 
       complete()
     },
 
-    finalize() {
+    cleanup() {
       for (const subscription of subscriptions) subscription.unsubscribe()
     }
   }
 })
-
 
 
 declare module "../observable/observable" {
@@ -35,4 +34,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.mergeMap = function() { return mergeMap(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.mergeMap = function() {return mergeMap(...arguments)(this)}

@@ -1,9 +1,9 @@
-import {Observable} from "../observable/observable"
 import {lift} from "../internal/lift"
+import {Observable} from "../observable/observable"
 
 export const bufferTime = <T>(duration:number) => lift<T, T[]>(observer => {
 
-  let timer:NodeJS.Timeout
+  let timer:ReturnType<typeof setTimeout>
   let group:T[] = []
 
   return {
@@ -15,11 +15,11 @@ export const bufferTime = <T>(duration:number) => lift<T, T[]>(observer => {
       }, duration)
     },
 
-    next(value) {
+    next(value:T) {
       group.push(value)
     },
 
-    finalize() {
+    cleanup() {
       clearInterval(timer)
     }
   }
@@ -32,4 +32,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.bufferTime = function() { return bufferTime(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.bufferTime = function() {return bufferTime(...arguments)(this)}

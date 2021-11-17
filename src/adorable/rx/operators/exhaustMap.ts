@@ -1,5 +1,5 @@
-import {Observable, Subscription} from "../observable/observable"
 import {lift} from "../internal/lift"
+import {Observable, Subscription} from "../observable/observable"
 
 export const exhaustMap = <T, R>(project:(value:T, index:number) => Promise<R>|Observable<R>|R) => lift<T, R>(observer => {
   let index = 0
@@ -13,7 +13,7 @@ export const exhaustMap = <T, R>(project:(value:T, index:number) => Promise<R>|O
   }, observer)
 
   return {
-    next(value) {
+    next(value:T) {
       if (subscription && !subscription.closed) return
       subscription = Observable.castAsync(project(value, index++)).subscribe(exhaustMapObserver)
     },
@@ -26,7 +26,7 @@ export const exhaustMap = <T, R>(project:(value:T, index:number) => Promise<R>|O
       }
     },
 
-    finalize() {
+    cleanup() {
       if (subscription) subscription.unsubscribe()
     }
   }
@@ -39,4 +39,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.exhaustMap = function() { return exhaustMap(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.exhaustMap = function() {return exhaustMap(...arguments)(this)}

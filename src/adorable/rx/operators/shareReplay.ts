@@ -20,13 +20,13 @@ export const shareReplay = <T>(bufferSize = Infinity) => (observable:Observable<
     observers.push(observer)
 
     subscription = subscription || observable.subscribe({
-      next(value) {
+      next(value:T) {
         buffer.push(value)
         buffer = buffer.slice(-bufferSize)
         for (const observer of observers) observer.next(value)
       },
 
-      error(error) {
+      error(error:any) {
         for (const observer of observers) observer.error(error)
       },
 
@@ -52,4 +52,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.shareReplay = function() { return shareReplay(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.shareReplay = function() {return shareReplay(...arguments)(this)}

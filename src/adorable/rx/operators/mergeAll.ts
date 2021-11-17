@@ -1,10 +1,10 @@
-import {Observable} from "../observable/observable"
 import {lift} from "../internal/lift"
+import {Observable} from "../observable/observable"
 
 export const mergeAll = <T>() => lift<T, T[]>(observer => {
   const ret:T[] = []
   return {
-    next(value) {
+    next(value:T) {
       ret.push(value)
     },
     complete() {
@@ -15,9 +15,10 @@ export const mergeAll = <T>() => lift<T, T[]>(observer => {
 
 declare module "../observable/observable" {
   interface Observable<T> {
-    mergeAll(project:(value:T, index:number) => T[]):Observable<T[]>
+    mergeAll():Observable<T[]>
   }
 }
 
 // @ts-ignore
-Observable.prototype.mergeAll = function() { return mergeAll(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.mergeAll = function() {return mergeAll(...arguments)(this)}

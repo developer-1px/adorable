@@ -1,7 +1,7 @@
-import {Observable, Subscription} from "../observable/observable"
 import {lift} from "../internal/lift"
-import type {Asyncable} from "../operator/castAsync"
+import {Observable, Subscription} from "../observable/observable"
 import {castAsync} from "../operator/castAsync"
+import type {Asyncable} from "../types"
 
 export const switchMap = <T, R>(project:(value:T, index:number) => Asyncable<R>) => lift<T, R>(observer => {
   let index = 0
@@ -15,7 +15,7 @@ export const switchMap = <T, R>(project:(value:T, index:number) => Asyncable<R>)
   }, observer)
 
   return {
-    next(value) {
+    next(value:T) {
       if (subscription) subscription.unsubscribe()
       subscription = castAsync(project(value, index++)).subscribe(switchMapObserver)
     },
@@ -27,7 +27,7 @@ export const switchMap = <T, R>(project:(value:T, index:number) => Asyncable<R>)
       }
     },
 
-    finalize() {
+    cleanup() {
       if (subscription) subscription.unsubscribe()
     }
   }
@@ -40,4 +40,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.switchMap = function() { return switchMap(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.switchMap = function() {return switchMap(...arguments)(this)}

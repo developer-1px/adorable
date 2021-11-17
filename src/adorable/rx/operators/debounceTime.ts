@@ -1,16 +1,16 @@
-import {Observable} from "../observable/observable"
 import {lift} from "../internal/lift"
+import {Observable} from "../observable/observable"
 
 export const debounceTime = <T>(dueTime:number) => lift<T, T>(observer => {
-  let timer:NodeJS.Timeout
+  let timer:ReturnType<typeof setTimeout>
 
   return {
-    next(value) {
+    next(value:T) {
       clearTimeout(timer)
       timer = setTimeout(() => observer.next(value), dueTime)
     },
 
-    finalize() {clearTimeout(timer)}
+    cleanup() {clearTimeout(timer)}
   }
 })
 
@@ -21,4 +21,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.debounceTime = function() { return debounceTime(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.debounceTime = function() {return debounceTime(...arguments)(this)}

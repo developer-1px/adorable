@@ -4,7 +4,7 @@
 import {Observable} from "../observable/observable"
 
 export const timer = (initialDelay:number, period?:number) => new Observable<number>(observer => {
-  let i = 0, id1:any, id2:any
+  let i = 0; let id1:any; let id2:any
 
   id1 = setTimeout(() => {
     if (observer.closed) return

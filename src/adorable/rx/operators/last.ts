@@ -1,10 +1,10 @@
-import {Observable} from "../observable/observable"
 import {lift} from "../internal/lift"
+import {Observable} from "../observable/observable"
 
 export const last = <T>() => lift<T, T>(observer => {
   let ret:T
   return {
-    next(value) {
+    next(value:T) {
       ret = value
     },
 
@@ -22,4 +22,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.last = function() { return last(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.last = function() {return last(...arguments)(this)}

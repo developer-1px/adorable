@@ -19,4 +19,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.until = function() { return until(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.until = function() {return until(...arguments)(this)}

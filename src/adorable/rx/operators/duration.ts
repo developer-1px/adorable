@@ -1,12 +1,12 @@
-import {Observable} from "../observable/observable"
 import {lift} from "../internal/lift"
+import {Observable} from "../observable/observable"
 
 export const duration = <T>(durationTime:number) => lift<T, T>(observer => {
-  let id:NodeJS.Timeout, completed = false
+  let id:ReturnType<typeof setTimeout>; let completed = false
   const queue:T[] = []
 
   return {
-    next(value) {
+    next(value:T) {
       if (!id) observer.next(value)
       else queue.push(value)
 
@@ -20,12 +20,11 @@ export const duration = <T>(durationTime:number) => lift<T, T>(observer => {
       completed = true
     },
 
-    finalize() {
+    cleanup() {
       clearTimeout(id)
     }
   }
 })
-
 
 
 declare module "../observable/observable" {
@@ -35,4 +34,5 @@ declare module "../observable/observable" {
 }
 
 // @ts-ignore
-Observable.prototype.duration = function() { return duration(...arguments)(this) }
+// eslint-disable-next-line prefer-rest-params
+Observable.prototype.duration = function() {return duration(...arguments)(this)}
