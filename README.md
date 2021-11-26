@@ -1,287 +1,48 @@
-# adorable/store
+# Svelte + TS + Vite
 
-> Observable based state management Library. Action / Dispatch / On / Reducer + able
+This template should help get you started developing with Svelte and TypeScript in Vite.
 
-## What is adorable?
+## Recommended IDE Setup
 
-TC39 Observable을 기반으로 하는 상태관리 라이브러리 입니다. RxJS와 Redux에서 영감을 받아 작성하였습니다. 두 라이브러리 모두 엄청 강력한 라이브러리이나 학습 진입장벽과 verbose한 문법으로
-인해 접근성이 떨어지는 부분을 보강하고 각각의 장점만을 결합할 수 있도록 하였습니다.
+[VSCode](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
 
-https://github.com/tc39/proposal-observable
+## Need an official Svelte framework?
 
-https://rxjs-dev.firebaseapp.com/guide/overview
+Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
 
-https://redux.js.org/
+## Technical considerations
 
-## Why adorable?
+**Why use this over SvelteKit?**
 
-웹 서비스가 거대해 질 수록 프론트엔트는 복잡성이라는 문제를 맞이 하게 됩니다. DOM API이라는 문제는 10년이 넘도록 잘 발전해온 React, Vue, Angular, Svelte와 같은 웹 프레임워크라는
-도구로 쉽게 제어가 가능해진 오늘날에도 상태관리와 비동기 처리라는 장벽은 남아 있습니다.
+- It brings its own routing solution which might not be preferable for some users.
+- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
+  `vite dev` and `vite build` wouldn't work in a SvelteKit environment, for example.
 
-Redux와 RxJs는 현재 점유율을 잃어 가고 있는 상황이지만 그 문제인식과 해법은 여전히 훌륭한 해결책이며 다소 아쉬운 문법과 진입장벽을 최소화 할 수 있도록 API를 최대한 간소하게 재설계 하였습니다.
+This template contains as little as possible to get started with Vite + TypeScript + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
 
-현재는 XState와 같은 유한 상태기계나 Recoil등의 family등의 최신 패러다임까지 흡수해 1) 상태관리 2) 비동기 3) 반응형 프로그래밍 4) 상태머신이라는 새로운 화두듣을 쉽게 사용할 수 있도록 패키지
-해 나갈 예정입니다.
+Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
 
-## What is direffent?
+**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
 
-- Rxjs: Pipe method vs DotChain vs Pipeline operator (TBD)
-- Redux: Why Reducer? Why Redux is verbose? What is benefit using Redux?
-- Props Drill, Context API
+Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
 
-## Read more (TBD)
+**Why include `.vscode/extensions.json`?**
 
-- 프론트 엔드에서 상태관리란 무엇이며 왜 필요할까?
-- 반응형 프로그래밍이란?
+Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
 
-## Goals
+**Why enable `allowJs` in the TS template?**
 
-> Write less, Do More!
+While `allowJs: false` would indeed prevent the use of `.js` files in the project, it does not prevent the use of JavaScript syntax in `.svelte` files. In addition, it would force `checkJs: false`, bringing the worst of both worlds: not being able to guarantee the entire codebase is TypeScript, and also having worse typechecking for the existing JavaScript. In addition, there are valid use cases in which a mixed codebase may be relevant.
 
----
+**Why is HMR not preserving my local component state?**
 
-## State Management (Basic)
+HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/rixo/svelte-hmr#svelte-hmr).
 
-### Simple Counter Example
+If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
 
-```typescript
-
+```ts
 // store.ts
-const _INCREARE = action("_INCREARE")
-const _DECREARE = action("_DECREARE")
-const _RESET = action("_RESET")
-
-export const counter$ = reducer(0, "counter$", counter$ => {
-
-  on(_INCREARE)
-    .writeTo(counter$, () => count => count + 1)
-
-  on(_DECREARE)
-    .writeTo(counter$, () => count => count - 1)
-
-  on(_RESET)
-    .writeTo(counter$, 0)
-})
+// An extremely simple external store
+import { writable } from 'svelte/store'
+export default writable(0)
 ```
-
-```html
-
-<script>
-import {dispatch} from "adorable"
-import {_INCREARE, _DECREARE, _RESET} from "./store"
-import {counter$} from "./store"
-
-const inc = () => dispatch(_INCREARE())
-const dec = () => dispatch(_DECREARE())
-const reset = () => dispatch(_RESET())
-</script>
-
-<div>count: {$counter$}</div>
-
-<button on:click={inc}>inc</button>
-<button on:click={dec}>dec</button>
-<button on:click={reset}>reset</button>
-```
-
-### action
-
-```typescript
-const _INCREARE = action("_INCREARE")
-const _DECREARE = action("_DECREARE")
-```
-
-### dispatch
-
-```typescript
-const on_inc_click = () => dispatch(_INCREARE())
-const on_dec_click = () => dispatch(_DECREARE())
-```
-
-### on
-
-```typescript
-on(_INCREARE)
-  .map(...)
-  .filter(...)
-  .writeTo()
-
-on(_DECREARE)
-  .map(...)
-  .filter(...)
-  .writeTo()
-
-```
-
-### reducer
-
-```typescript
-const counter$ = reducer(0, "counter$", counter$ => {
-
-  on(_INCREARE)
-    .writeTo(counter$, () => count => count + 1)
-
-  on(_DECREARE)
-    .writeTo(counter$, () => count => count - 1)
-})
-```
-
-### ref
-
-```typescript
-const ref$ = ref(0)
-
-ref$.set(10)
-ref$.update(value => value + 1)
-```
-
-### effect
-
-```typescript
-
-on(_INCREARE)
-  .tap(value => console.log("INCREASE!", value))
-  .createEffect()
-
-```
-
-## State Management (Advanced)
-
-### story
-
-```typescript
-
-story("counter log", () => {
-
-  on(_INCREARE)
-    .tap(value => console.log("INCREASE!", value))
-    .createEffect()
-
-...
-})
-
-```
-
-### state/epic (TBD)
-
-```typescript
-
-const isHome$ = state(page_id$, (page_id) => page_id === "Home")
-const isSignIn$ = state(account$, (account) => account && account.id)
-
-const {reducer, story} = epic(isHome$)
-
-const onlyAvailableInHome$ = reducer(false, "onlyAvailableInHome$", onlyAvailableInHome$ => {
-
-...
-})
-
-
-```
-
-### collection (TBD)
-
-```typescript
-
-const todos$$ = collection("todos", (todo) => todo.id, (todo, id) => todo.id = id)
-
-todos$$("some id").set({title: "hello", completed: false})
-
-todos$$("some id").set(undefined)
-
-todos$$("some id222").update(todo => ({...todo, title: "xxxx"}))
-
-
-```
-
-### testCase (TBD)
-
-```typescript
-
-testCase("test for counter", ({given, when, then}) => {
-
-  given(streamA$, 10)
-  given(streamB$, "abc")
-  given(streamC$, "def")
-
-  when(_ACTION_A("abcdef"))
-
-  then(() => {
-
-    on(_ACTION_A.REQUEST)
-      .exptectTo("abcdef")
-
-    on(_ACTION_A.SUCCESS)
-      .exptectTo(300)
-
-    on(_ACTION_A.FAILTURE)
-      .exptectTo(300)
-  })
-
-})
-
-```
-
----
-
-## Rx
-
-- pipe method를 다시 dot chain Method로 만들고 실전에서 꼭 쓰이는 operator만을 골라 단순화하고 typescript를 붙였습니다.
-
-### Observable
-
-#### #static operator
-
-- toPromise
-- castAsync
-- combineLatest
-- concat
-- defer
-- EMPTY
-- forkjoin
-- fromEvent
-- fromEventPattern
-- fromPromise
-- merge
-- NEVER
-- timer
-- throwError
-
-#### #operators
-
-- bufferCount
-- bufferTime
-- concat
-- count
-- concatMap
-- debounceTime
-- delay
-- distinctUntilChanged
-- duration
-- exhaustMap
-- filter
-- finalize
-- ignoreElements
-- initialize
-- last
-- map
-- mapTo
-- mergeAll
-- mergeMap
-- scan
-- share
-- shareReplay
-- skip
-- skipUntil
-- startWith
-- switchMap
-- tap
-- take
-- takeLast
-- takeUntil
-- takeWhile
-- throttle
-- throttleTime
-- timeout
-- trace
-- until
-- waitFor

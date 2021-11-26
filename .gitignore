@@ -1,8 +1,4 @@
 /node_modules/
-/public/build/
+/dist/
+/.vscode/
 .DS_Store
-.firebase
-*.log
-.idea
-coverage
-dist

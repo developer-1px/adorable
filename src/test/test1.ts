@@ -1,4 +1,4 @@
-import {Observable} from "../adorable"
+import {Observable} from "../../adorable"
 
 const observable$ = new Observable<number>(observer => {
   observer.next(1)

@@ -1,75 +1,45 @@
-const __is = (a) => (b) => Object.is(a, b)
-
-export const filterCallback = (callback) => {
-  if (Object(callback) !== callback) return __is(callback)
-  if (typeof callback === "function") return callback
-
-  return (object) => {
-    for (let [key, _callback] of Object.entries(callback)) {
-      if (typeof _callback !== "function") _callback = __is
-      // @ts-ignore
-      if (_callback(object[key])) return true
-    }
-    return false
-  }
-}
-
-export const mapCallback = (callback) => {
-  if (Object(callback) !== callback) return callback
-  if (typeof callback === "function") return callback
-
-  return (object) => {
-    object = {...object}
-    for (let [key, _callback] of Object.entries(callback)) {
-      if (typeof _callback !== "function") {
-        object[key] = _callback
-      }
-      else {
-        object[key] = _callback(object[key])
-      }
-    }
-
-    return object
-  }
-}
-
+export const __is = (a:any) => (b:any) => Object.is(a, b)
 
 /// localStorage
 export const __localStorage = {
-  getItem: (key, defaults = undefined) => {
+  getItem: <T>(key:string, defaults:T):T => {
     try {
-      return JSON.parse(localStorage.getItem(key)) || defaults
+      const item = localStorage.getItem(key)
+      return item === null ? defaults : JSON.parse(item)
     }
     catch (e) {
       return defaults
     }
   },
-  setItem: (key) => (value) => localStorage.setItem(key, JSON.stringify(value))
+  setItem: <T>(key:string) => (value:T) => localStorage.setItem(key, JSON.stringify(value))
 }
 
 export const __sessionStorage = {
-  getItem: (key, defaults = undefined) => {
+  getItem: <T>(key:string, defaults = undefined):T|undefined => {
     try {
-      return JSON.parse(sessionStorage.getItem(key)) || defaults
+      const item = sessionStorage.getItem(key)
+      return item === null ? defaults : JSON.parse(item)
     }
     catch (e) {
       return defaults
     }
   },
-  setItem: (key) => (value) => sessionStorage.setItem(key, JSON.stringify(value))
+  setItem: <T>(key:string) => (value:T) => sessionStorage.setItem(key, JSON.stringify(value))
 }
 
 /// common.js
-export const __itself = (value) => () => value
-export const __isFunction = (value) => typeof value === "function"
+export const __itself = (value:any) => () => value
 
 
 /// Util
-export const __typeof = (value) => {
+export const __typeof = (value:any) => {
   const s = typeof value
 
-  if ("object" === s) {
+  if (s === "object") {
     if (value) {
+      if (value instanceof Date) {
+        return "date"
+      }
       if (value instanceof Array) {
         return "array"
       }
@@ -79,15 +49,17 @@ export const __typeof = (value) => {
 
       const className = Object.prototype.toString.call(value)
 
-      if ("[object Window]" === className) {
+      if (className === "[object Window]") {
         return "object"
       }
 
-      if ("[object Array]" === className || "number" == typeof value.length && "undefined" != typeof value.splice && "undefined" != typeof value.propertyIsEnumerable && !value.propertyIsEnumerable("splice")) {
+      // eslint-disable-next-line no-prototype-builtins
+      if (className === "[object Array]" || (typeof value.length === "number" && typeof value.splice !== "undefined" && typeof value.propertyIsEnumerable !== "undefined" && !value.propertyIsEnumerable("splice"))) {
         return "array"
       }
 
-      if ("[object Function]" === className || "undefined" != typeof value.call && "undefined" != typeof value.propertyIsEnumerable && !value.propertyIsEnumerable("call")) {
+      // eslint-disable-next-line no-prototype-builtins
+      if (className === "[object Function]" || (typeof value.call !== "undefined" && typeof value.propertyIsEnumerable !== "undefined" && !value.propertyIsEnumerable("call"))) {
         return "function"
       }
     }
@@ -96,7 +68,7 @@ export const __typeof = (value) => {
     }
   }
   else {
-    if ("function" === s && "undefined" == typeof value.call) {
+    if (s === "function" && typeof value.call === "undefined") {
       return "object"
     }
   }
@@ -109,8 +81,8 @@ export const __typeof = (value) => {
 export const __cloneObject = (obj, circular = [], cloned = []) => {
 
   const type = __typeof(obj)
-  if ("object" === type || "array" === type) {
-    if ("function" === typeof obj.clone) {
+  if (type === "object" || type === "array") {
+    if (typeof obj.clone === "function") {
       return obj.clone()
     }
 
@@ -119,7 +91,7 @@ export const __cloneObject = (obj, circular = [], cloned = []) => {
       return cloned[index]
     }
 
-    let clone = "array" === type ? [] : {}, key
+    const clone = type === "array" ? [] : {}; let key
     for (key in obj) {
       clone[key] = __cloneObject(obj[key], circular)
     }
@@ -132,41 +104,9 @@ export const __cloneObject = (obj, circular = [], cloned = []) => {
   return obj
 }
 
-
-/// array.js
-export const __push = (item) => (array) => [...array, item]
-export const __isArray = (item) => Array.isArray(item)
-export const __castArray = (a) => __isArray(a) ? a : [a]
-export const __array_difference = (a, b, callback = __itself) => a.filter(x => !b.map(callback).includes(callback(x))).concat(b.filter(x => !a.map(callback).includes(callback(x))))
-
-
 export const __memoize1 = (func) => {
   const cache = Object.create(null)
   return (key, ...args) => {
     return (cache[key] = key in cache ? cache[key] : func(key, ...args))
   }
-}
-
-
-export const __array_unique = (array, callback = a => a): any[] => {
-  let result = Object.create(null)
-  array.forEach(item => {
-    const key = callback(item)
-    // @ts-ignore
-    result[key] = result[key] || item
-  })
-
-  return Object.values(result)
-}
-
-
-export const __array__group_by = (array, makeKeyCallback) => {
-  const groupBy = Object.create(null)
-  array.forEach(row => {
-    const key = makeKeyCallback(row)
-    groupBy[key] = groupBy[key] || []
-    groupBy[key].push(row)
-  })
-
-  return groupBy
 }

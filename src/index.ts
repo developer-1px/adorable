@@ -16,7 +16,7 @@
 // }
 
 
-import type {Ref} from "./adorable"
+import type {Ref} from "../adorable"
 
 type ID = string|number
 
