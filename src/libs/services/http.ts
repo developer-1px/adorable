@@ -1,15 +1,5 @@
 import {dispatch, Observable} from "../adorable"
 
-export const uri = (stings:TemplateStringsArray, ...keys:any[]) => {
-  let result = stings[0]
-  for (let i = 0; i < keys.length; ++i) {
-    result += encodeURIComponent(keys[i]) + stings[i + 1]
-  }
-  return result
-}
-
-export const form_urlencode = (object:Record<string, string>) => Object.entries(object).filter(([key, value]) => key && (value !== null && value !== undefined)).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join("&")
-
 interface RequestInitEx extends RequestInit {
   host?:string
   url?:string
@@ -19,7 +9,20 @@ interface RequestInitEx extends RequestInit {
   onBeforeSend?:Function
   catchError?:Function
   preScript?:Function
+  cacheKey?:string
 }
+
+const cache304 = Object.create(null)
+
+export const uri = (stings:TemplateStringsArray, ...keys:any[]) => {
+  let result = stings[0]
+  for (let i = 0; i < keys.length; ++i) {
+    result += encodeURIComponent(keys[i]) + stings[i + 1]
+  }
+  return result
+}
+
+export const form_urlencode = (object:Record<string, string>) => Object.entries(object).filter(([key, value]) => key && (value !== null && value !== undefined)).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join("&")
 
 export interface HttpService {}
 
@@ -53,6 +56,7 @@ export class HttpService {
 
   onBeforeSend(onBeforeSend:Function) {return this.request({onBeforeSend})}
 
+  cacheKey(cacheKey:string) {return this.request({cacheKey})}
 
   /// Request - methods
   method(method:string, ...url:string[]) {return this.request({method, url: url.join("/")})}
@@ -87,6 +91,7 @@ export class HttpService {
     let url = (init.host || "") + init.url
 
     const {query} = init
+
     if (query) {
       const params = form_urlencode(query)
       if (params.length) {
@@ -110,22 +115,37 @@ export class HttpService {
     }
 
     const response = init.response || ((res:Response) => res.text())
+
+    const method = (init.method ?? "get").toLowerCase()
+
     return new Observable<T>(observer => {
       if (init.onBeforeSend) {
         init.onBeforeSend(init)
       }
 
       /// @FIXME: MOCK UP / SUCCESS / FAILURE 분기 처리
-      let ok = true
       const request = fetch(url, init)
-        .then(res => {
-          ok = res.ok
-          return res
-        })
-        .then(response)
-        .then(res => {
-          if (!ok) throw init.catchError ? (init.catchError(res) ?? res) : res
-          return res
+        .then(async (res) => {
+          const {ok, status, url} = res
+          const data = await response(res)
+
+          // @FIMX: 304 로컬캐시 기능은 고민할 거리가 많아 보류함.
+
+          // const key = init.cacheKey ?? url
+          // if (method === "get" && status === 304) {
+          //   console.warn("cache304", res, method, url, cache304, cache304[method + " " + key])
+          //   return cache304[method + " " + key]
+          // }
+
+          if (status !== 304 && !ok) {
+            throw init.catchError ? (init.catchError(data) ?? data) : data
+          }
+
+          // if (method === "get") {
+          //   cache304[method + " " + key] = await data
+          // }
+
+          return data
         })
 
       return Observable.castAsync<T>(request)

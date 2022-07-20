@@ -1,11 +1,13 @@
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import utc from "dayjs/plugin/utc"
+import timezone from "dayjs/plugin/timezone"
 
 // @NOTE: 사파리에서 dayjs.extend시 dayjs를 찾지 못하는 버그가 있어서 window에 등록함.
 // @ts-ignore
 window.dayjs = dayjs
 dayjs.extend(utc)
+dayjs.extend(timezone)
 dayjs.extend(customParseFormat)
 
 const tokenizer = (lex:[RegExp, Function][], ...params:any[]) => {
@@ -55,7 +57,7 @@ const lex:[RegExp, Function][] = [
 export const createDateFormat = (format:string, locale = "kr") => {
   const formatter = tokenizer(lex, locale)(format)
   return (date:Date) => {
-    date = new Date(date || new Date())
+    date = DateTime.from(date)
     return formatter.map(fn => fn(date)).join("")
   }
 }
@@ -181,6 +183,10 @@ export class DateTime extends Date {
       case "month": {return date.add({months: +1}).with({date: 1})}
     }
     return date
+  }
+
+  daysInMonth() {
+    return new Date(this.getFullYear(), this.getMonth() + 1, 0).getDate()
   }
 
   format(format:string):string {

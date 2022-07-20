@@ -10,17 +10,14 @@ const get = <T>(path:string, defaultValue:T):T|undefined => {
   return object === undefined ? defaultValue : object
 }
 
-function set<T>(path:string, value:T) {
-  if (arguments.length !== 2) throw new Error("value arguments must be required.")
-
-  let object = __state__
+const set = <T>(path:string, value:T) => {
   const paths = ["database", ...path.split("/").filter(Boolean)]
-
   const prop = paths.pop()
   const key = paths.pop()
 
   if (!key || !prop) throw new Error("invalid path")
 
+  let object = __state__
   paths.every(path => {
     object = object[path] = object[path] || Object.create(null)
     return object
@@ -35,21 +32,44 @@ function set<T>(path:string, value:T) {
   return (object[key] = {...object[key], [prop]: value})
 }
 
-const memo = Object.create(null)
+const remove = (path:string) => {
+  const paths = ["database", ...path.split("/").filter(Boolean)]
+  const prop = paths.pop()
+  const key = paths.pop()
 
+  if (!key || !prop) throw new Error("invalid path")
+
+  let object = __state__
+  paths.every(prop => (object = object[prop]))
+
+  if (!object[key]) {
+    return
+  }
+
+  if (Array.isArray(object[key]) && Number.isInteger(prop)) {
+    object[key] = [...object[key]]
+    const ret = object[key][prop]
+    object[key].splice(prop, 1)
+    return ret
+  }
+
+  object[key] = {...object[key]}
+  const ret = object[key][prop]
+  delete object[key][prop]
+  return ret
+}
+
+const memo = Object.create(null)
 
 interface DateBaseRef<T> extends Ref<T> {
   isStopPropagation:boolean
 
   remove():T
   query():T[]
-  toArray():T[]
+  toArray<R = T>():R[]
   orderBy(compareFn?:(a:T, b:T) => number):Observable<T[]>
   orderByChild(key:string):Observable<T[]>
 }
-
-
-let broadcast_paths:string[] = []
 
 function notify(path:string, value:any) {
   if (!memo[path]) return
@@ -58,12 +78,39 @@ function notify(path:string, value:any) {
   }
 }
 
+let broadcast_paths:string[] = []
+
+const broadcast = (path:string) => {
+  // 이벤트 전파 예약
+  if (broadcast_paths.length === 0) {
+    Promise.resolve().then(() => {
+      const update_broadcast_paths = __array_unique(broadcast_paths)
+      broadcast_paths = []
+      update_broadcast_paths.forEach(path => notify(path, get(path, undefined)))
+    })
+  }
+
+  // 이벤트 전파 (downcast)
+  Object.keys(memo).filter(p => p !== path && p.startsWith(path)).filter(Boolean).forEach(path => {
+    broadcast_paths.push(path)
+  })
+
+  // 이벤트 전파 (upcast)
+  path.split("/").forEach((_, index, A) => {
+    const subPath = A.slice(0, A.length - index - 1).join("/")
+    if (subPath) {
+      broadcast_paths.push(subPath)
+    }
+  })
+}
+
+
 export function database<T = any>(path:string, defaultValue?:T|undefined):DateBaseRef<T> {
   path = "/" + path.split("/").filter(Boolean).join("/")
 
   if (path && memo[path]) {
     const r$ = memo[path]
-    r$.value = get(path, defaultValue)
+    r$.value = r$.value ?? defaultValue
     return r$
   }
 
@@ -92,32 +139,10 @@ export function database<T = any>(path:string, defaultValue?:T|undefined):DateBa
 
     // 변경사항 전파
     if (safe_not_equal(r$.value, value)) {
-
       set(path, value)
       r$.next(value)
       middleware$.next(["database", {path, value}])
-
-      // 이벤트 전파 예약
-      if (broadcast_paths.length === 0) {
-        Promise.resolve().then(() => {
-          const update_broadcast_paths = __array_unique(broadcast_paths)
-          broadcast_paths = []
-          update_broadcast_paths.forEach(path => notify(path, get(path, defaultValue)))
-        })
-      }
-
-      // 이벤트 전파 (downcast)
-      Object.keys(memo).filter(p => p !== path && p.startsWith(path)).filter(Boolean).forEach(path => {
-        broadcast_paths.push(path)
-      })
-
-      // 이벤트 전파 (upcast)
-      path.split("/").forEach((_, index, A) => {
-        const subPath = A.slice(0, A.length - index - 1).join("/")
-        if (subPath) {
-          broadcast_paths.push(subPath)
-        }
-      })
+      broadcast(path)
     }
 
     return value

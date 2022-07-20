@@ -161,37 +161,49 @@ story("counter log", () => {
 
 ```
 
-### state/epic (TBD)
+### database
 
 ```typescript
 
-const isHome$ = state(page_id$, (page_id) => page_id === "Home")
-const isSignIn$ = state(account$, (account) => account && account.id)
+database(`/foo/bar`)
+  .tap(value => { ... })
+  .createEffect()
 
-const {reducer, story} = epic(isHome$)
 
-const onlyAvailableInHome$ = reducer(false, "onlyAvailableInHome$", onlyAvailableInHome$ => {
+const nestedValue$ = database(`/foo/bar/baz`)
 
-...
-})
+nestedValue$.set(100)
+nestedValue$.update(baz => baz + 100)
 
+const nestedValueArray$ = database(`/foo/bar/collection`).orderBy((a, b) => a.timestamp - b.timestamp)
 
 ```
 
-### collection (TBD)
+### AQL
 
 ```typescript
 
-const todos$$ = collection("todos", (todo) => todo.id, (todo, id) => todo.id = id)
+const nestedValue$ = SELECT(db.foo.bar)
 
-todos$$("some id").set({title: "hello", completed: false})
+UPDATE(db.foo.bar).set(100)
+UPDATE(db.foo.bar).update(bar => bar + 100)
 
-todos$$("some id").set(undefined)
+DELETE(db.foo.bar)
 
-todos$$("some id222").update(todo => ({...todo, title: "xxxx"}))
+const nestedValueArray$ = SELECT(db.foo.bar.collection).ORDER_BY((a, b) => a.timestamp - b.timestamp)
 
+const todo = {
+  id: 1,
+  title: "hello"
+}
 
+INSERT(db.foo.bar.collection, "id").VALUES(todo)
 ```
+
+### Adorable Fetching Query(TBD)
+
+- 서버 API연동시 어떻게 loading과 캐시와 invalidate를 관리할 것인가?
+
 
 ### testCase (TBD)
 
@@ -223,13 +235,13 @@ testCase("test for counter", ({given, when, then}) => {
 
 ---
 
-## Rx
+## RxJs
 
-- pipe method를 다시 dot chain Method로 만들고 실전에서 꼭 쓰이는 operator만을 골라 단순화하고 typescript를 붙였습니다.
+- 개발 편의를 위해서 Rxjs의 pipe method를 다시 dot chain method로 만들고, 실전에서 꼭 쓰이는 operator만을 골라 단순화하고 typescript를 붙였습니다.
 
 ### Observable
 
-#### #static operator
+#### static operator
 
 - toPromise
 - castAsync
@@ -246,13 +258,14 @@ testCase("test for counter", ({given, when, then}) => {
 - timer
 - throwError
 
-#### #operators
+#### operators
 
 - bufferCount
 - bufferTime
 - concat
 - count
 - concatMap
+- debounce
 - debounceTime
 - delay
 - distinctUntilChanged
@@ -285,3 +298,4 @@ testCase("test for counter", ({given, when, then}) => {
 - trace
 - until
 - waitFor
+- withLatestFrom

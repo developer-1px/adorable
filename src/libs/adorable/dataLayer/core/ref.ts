@@ -30,7 +30,11 @@ export function ref<T>(value:T|undefined = undefined, path:string = guid("#")):R
   if (path.charAt(0) !== "#") {
     // @ts-ignore // @FIXME: database / store 임시 보관
     r$.tap(value => __state__.store[path] = value)
-      .tap(() => middleware$.next(["ref", {path, value}]))
+      .tap(() => {
+        console.groupCollapsed("(callStack)")
+        console.trace("")
+        console.groupEnd()
+      })
       .trace(path)
       .createEffect()
   }

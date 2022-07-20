@@ -1,30 +1,34 @@
 import {Observable, Subscription} from "../observable/observable"
 import {Subject} from "../observable/subject"
 
-export const retryWhen = <T>(receives:(errors:Observable<any>) => Observable) => (observable:Observable<T>) => {
+export const retryWhen = <T>(notifier:(error$:Observable<any>) => Observable) => (observable:Observable<T>) => {
 
   return new Observable<T>(observer => {
-    let s2:Subscription, s3:Subscription
-    // 에러 Subject
-    const errors = new Subject<any>()
+    let s2:Subscription
+    let s3:Subscription
+    const error$ = new Subject<any>()
 
     const s1 = observable.subscribe(Object.setPrototypeOf({
-      error(error:any) {
-        s2 = s2 || receives(errors).subscribe(() => {
+      error(originalError:any) {
+        s2 = notifier(error$).subscribe(proxyError => {
+          if (originalError !== proxyError) {
+            s2.unsubscribe()
+            return
+          }
           s3 = observable.subscribe(Object.setPrototypeOf({
-            error: (err:any) => errors.next(err)
+            error: (error:any) => error$.next(originalError = error)
           }, observer))
         })
 
-        errors.next(error)
+        error$.next(originalError)
       }
     }, observer))
 
     return () => {
-      errors.complete()
-      s1.unsubscribe()
-      s2 && s2.unsubscribe()
       s3 && s3.unsubscribe()
+      s2 && s2.unsubscribe()
+      s1.unsubscribe()
+      error$.complete()
     }
   })
 }

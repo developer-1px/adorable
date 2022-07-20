@@ -70,3 +70,9 @@ export const array_group_by = <T>(makeKeyCallback:((item:T) => string)) => (arra
 
   return groupBy
 }
+
+export const array_to_record = <T>(makeKey = (t:T) => String(t)) => (arr:T[]) => {
+  const obj:Record<string, T> = Object.create(null)
+  arr.forEach(value => (obj[makeKey(value)] = value))
+  return obj
+}
