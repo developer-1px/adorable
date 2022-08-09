@@ -154,7 +154,7 @@ export class HttpService {
           res => dispatch(init.method + " " + url + ".SUCCESS", res),
           err => dispatch(init.method + " " + url + ".FAILURE", err)
         )
-        .subscribe(observer)
+        .subscribe2(observer)
     })
   }
 }

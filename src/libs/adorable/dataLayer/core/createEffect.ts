@@ -22,7 +22,7 @@ export function createEffect<T>(...args:any[]) {
     const s = observable.pipe(catchError(error => {
       Observable.hostReportErrors(error)
       return Observable.EMPTY
-    })).subscribe(...args)
+    })).subscribe2(...args)
 
     subscriptions.push(s)
     try {onMount(() => () => s.unsubscribe())}

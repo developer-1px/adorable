@@ -12,7 +12,7 @@ export const merge = <T>(...observables:Observable<T>[]) => new Observable<T>(ob
     }
   }, observer)
 
-  const subscriptions = observables.map(observable => observable.subscribe(mergeObserver))
+  const subscriptions = observables.map(observable => observable.subscribe2(mergeObserver))
 
   return () => {
     for (const s of subscriptions) s.unsubscribe()

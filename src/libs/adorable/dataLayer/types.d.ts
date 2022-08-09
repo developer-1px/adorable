@@ -22,7 +22,6 @@ export interface ActionCreator<T = any, S = any, F = any> extends SingleActionCr
 
 // Data Layer - (Ref)
 export interface Ref<T> extends BehaviorSubject<T> {
-length:number
   path:string
   value:T
   set(value:T):T

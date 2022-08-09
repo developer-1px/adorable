@@ -8,7 +8,7 @@ export const catchError = <T>(callback:(error:any, caught:Observable<T>) => Obse
     error(error:any) {
       const caught:Observable<T> = createCaught()
       const o$ = castAsync(callback(error, caught) ?? caught)
-      o$.subscribe(observer)
+      o$.subscribe2(observer)
     }
   }))(observable)
 

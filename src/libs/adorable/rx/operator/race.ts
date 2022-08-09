@@ -16,7 +16,7 @@ export const race = <T>(...observables:Observable<T>[]) => new Observable<T>(obs
 
   for (let i = 0, len = observables.length; i < len; i++) {
     if (hasWinner) break
-    subscriptions.push(observables[i].subscribe(createRaceObserver(i)))
+    subscriptions.push(observables[i].subscribe2(createRaceObserver(i)))
   }
 
   return () => {

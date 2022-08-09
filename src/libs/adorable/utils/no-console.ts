@@ -1,4 +1,4 @@
-import {env} from "../../../config"
+import {testOnly} from "../../../config"
 import {__state__} from "../dataLayer"
 
 const noop = () => {}
@@ -51,4 +51,4 @@ const useConsole = (flag:boolean) => {
   }
 }
 
-useConsole(env.phase !== "prod")
+useConsole(testOnly)

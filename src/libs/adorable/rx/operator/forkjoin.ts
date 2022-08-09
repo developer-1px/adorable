@@ -12,7 +12,7 @@ export const forkjoin = <T>(...observables:Observable<T>[]) => new Observable<T[
   }
 
   observables.forEach((observable, index) => {
-    last()(observable).subscribe(value => {
+    last()(observable).subscribe2(value => {
       ret[index] = value
       if (++count === ret.length) {
         observer.next(ret)

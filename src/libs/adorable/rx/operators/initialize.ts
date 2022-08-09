@@ -9,7 +9,7 @@ export const initialize = <T>(initialize:(value:T) => void) => (observable:Obser
     }
   }, observer)
 
-  return observable.subscribe(o)
+  return observable.subscribe2(o)
 })
 
 declare module "../observable/observable" {

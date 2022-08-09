@@ -3,7 +3,7 @@ import type {LiftCallback} from "../types"
 
 export const lift = <T, U>(liftCallback:LiftCallback<T, U>) => (observable:Observable<T>) => new Observable<U>(observer => {
   const o = liftCallback(observer) || {}
-  const subscription = observable.subscribe(Object.setPrototypeOf(o, observer))
+  const subscription = observable.subscribe2(Object.setPrototypeOf(o, observer))
   return () => {
     o.cleanup && o.cleanup()
     subscription.unsubscribe()

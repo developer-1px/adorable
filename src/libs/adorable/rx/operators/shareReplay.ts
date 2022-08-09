@@ -19,7 +19,7 @@ export const shareReplay = <T>(bufferSize = Infinity) => (observable:Observable<
 
     observers.push(observer)
 
-    subscription = subscription || observable.subscribe({
+    subscription = subscription || observable.subscribe2({
       next(value:T) {
         buffer.push(value)
         buffer = buffer.slice(-bufferSize)

@@ -20,7 +20,7 @@ export const throttle = <T>(durationSelector:(...args:any[]) => Observable<any>)
       return
     }
 
-    s = take(1)(durationSelector(value)).subscribe({
+    s = take(1)(durationSelector(value)).subscribe2({
       next() {
         if (hasValue) observer.next(emitValue)
         hasValue = false

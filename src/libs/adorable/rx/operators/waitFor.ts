@@ -13,7 +13,7 @@ export function waitFor<T>(...other:Observable<any>[]) {
 
     return ({
       next(value:T) {
-        s = s || Observable.combineLatest(...other, subject).subscribe({
+        s = s || Observable.combineLatest(...other, subject).subscribe2({
           next(value) {
             value2 = [...value.slice(-1), ...value.slice(0, -1)]
             if (isWaiting) {

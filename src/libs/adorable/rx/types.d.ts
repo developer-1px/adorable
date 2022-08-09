@@ -13,6 +13,7 @@ export interface Observer<T> {
   error?:OnError
   complete?:OnComplete
 }
+
 export interface LiftObserver<T> extends Observer<T> {
   start?:OnStart
   next?:OnNext<T>
@@ -24,8 +25,8 @@ export interface LiftObserver<T> extends Observer<T> {
 export type LiftCallback<T, U> = (observer:SubscriptionObserver<U>) => LiftObserver<T>
 
 export interface ObservableLike<T> {
-  subscribe(observer:Observer<T>):any
   subscribe(next?:OnNext<T>, error?:OnError, complete?:OnComplete):any
+  subscribe(observer:Observer<T>):any
 }
 
 // eslint-disable-next-line no-use-before-define

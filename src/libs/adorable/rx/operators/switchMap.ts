@@ -17,7 +17,7 @@ export const switchMap = <T, R>(project:(value:T, index:number) => Asyncable<R>)
   return {
     next(value:T) {
       if (subscription) subscription.unsubscribe()
-      subscription = castAsync(project(value, index++)).subscribe(switchMapObserver)
+      subscription = castAsync(project(value, index++)).subscribe2(switchMapObserver)
     },
 
     complete() {

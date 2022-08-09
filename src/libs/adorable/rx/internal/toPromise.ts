@@ -1,7 +1,7 @@
 import {Observable} from "../observable/observable"
 
 export const toPromise = <T>() => (observable:Observable<T>) => new Promise<T>((resolve, reject) => {
-  observable.take(1).subscribe(resolve, reject)
+  observable.take(1).subscribe2(resolve, reject)
 })
 
 declare module "../observable/observable" {

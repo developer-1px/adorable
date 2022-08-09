@@ -6,7 +6,7 @@ export const skipUntil = <T>(notifier:Observable<any>) => lift<T, T>(observer =>
   let hasValue = false
   return {
     start() {
-      notifier.pipe(take(1)).subscribe(() => hasValue = true)
+      notifier.pipe(take(1)).subscribe2(() => hasValue = true)
     },
 
     next(value:T) {

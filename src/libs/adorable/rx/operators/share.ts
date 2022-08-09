@@ -7,7 +7,7 @@ export const share = <T>() => (observable:Observable<T>) => {
   return new Observable(observer => {
     observers.push(observer)
 
-    subscription = subscription || observable.subscribe({
+    subscription = subscription || observable.subscribe2({
       next(value:T) {
         for (const observer of observers) observer.next(value)
       },

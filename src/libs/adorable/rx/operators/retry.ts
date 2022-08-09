@@ -6,10 +6,10 @@ export const retry = <T>(count:number, error?:any) => (observable:Observable<T>)
   return new Observable<T>(observer => {
     let s2:Subscription
 
-    const s1 = observable.subscribe(Object.setPrototypeOf({
+    const s1 = observable.subscribe2(Object.setPrototypeOf({
       error(error:any) {
         s1.unsubscribe()
-        s2 = retry<T>(--count, error)(observable).subscribe(observer)
+        s2 = retry<T>(--count, error)(observable).subscribe2(observer)
       }
     }, observer))
 

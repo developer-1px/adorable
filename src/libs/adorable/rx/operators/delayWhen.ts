@@ -10,7 +10,7 @@ export const delayWhen = <T>(delayDurationSelector:(value:T, index:number) => As
 
   return {
     next(value:T) {
-      const s = castAsync(delayDurationSelector(value, index++)).subscribe(() => {
+      const s = castAsync(delayDurationSelector(value, index++)).subscribe2(() => {
         observer.next(value)
         if (completed) observer.complete()
         s.unsubscribe()

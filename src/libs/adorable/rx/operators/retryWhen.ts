@@ -8,14 +8,14 @@ export const retryWhen = <T>(notifier:(error$:Observable<any>) => Observable) =>
     let s3:Subscription
     const error$ = new Subject<any>()
 
-    const s1 = observable.subscribe(Object.setPrototypeOf({
+    const s1 = observable.subscribe2(Object.setPrototypeOf({
       error(originalError:any) {
-        s2 = notifier(error$).subscribe(proxyError => {
+        s2 = notifier(error$).subscribe2(proxyError => {
           if (originalError !== proxyError) {
             s2.unsubscribe()
             return
           }
-          s3 = observable.subscribe(Object.setPrototypeOf({
+          s3 = observable.subscribe2(Object.setPrototypeOf({
             error: (error:any) => error$.next(originalError = error)
           }, observer))
         })

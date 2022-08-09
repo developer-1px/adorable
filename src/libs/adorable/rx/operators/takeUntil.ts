@@ -2,8 +2,8 @@ import {Observable} from "../observable/observable"
 
 export const takeUntil = <T>(notifier:Observable<any>) => (observable:Observable<T>) => new Observable<T>(observer => {
   const complete = observer.complete.bind(observer)
-  const s = observable.subscribe(observer)
-  const s2 = notifier.subscribe(complete, complete, complete)
+  const s = observable.subscribe2(observer)
+  const s2 = notifier.subscribe2(complete, complete, complete)
 
   return () => {
     s.unsubscribe()

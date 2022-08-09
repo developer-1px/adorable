@@ -98,9 +98,13 @@ export class Observable<T = any> {
     }
   }
 
-  subscribe(observer:Observer<T>):Subscription
-  subscribe(next?:OnNext<T>, error?:OnError, complete?:OnComplete):Subscription
-  subscribe(observer?:Observer<T>|OnNext<T>, error?:OnError, complete?:OnComplete):Subscription {
+  subscribe(next?:OnNext<T>, error?:OnError, complete?:OnComplete):Subscription {
+    return this.subscribe2({next, error, complete})
+  }
+
+  subscribe2(observer:Observer<T>):Subscription
+  subscribe2(next?:OnNext<T>, error?:OnError, complete?:OnComplete):Subscription
+  subscribe2(observer?:Observer<T>|OnNext<T>, error?:OnError, complete?:OnComplete):Subscription {
     if (typeof observer === "function") observer = {next: observer, error, complete}
     else if (typeof observer !== "object") observer = {}
     return new Subscription(observer, this.subscriber)

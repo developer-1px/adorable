@@ -11,7 +11,7 @@ export function combineLatest(...observables:Observable[]) {
     let combined = false
     let num_completed = 0
 
-    const combine = (observable:Observable, index:number) => observable.subscribe({
+    const combine = (observable:Observable, index:number) => observable.subscribe2({
       next(value:any) {
         arr[index] = value
 

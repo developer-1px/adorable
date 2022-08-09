@@ -6,7 +6,7 @@ export function withLatestFrom<T>(...inputs:Observable<any>[]) {
   return lift<T, any[]>(observer => {
 
     let value2:any[]
-    const s = Observable.combineLatest(...inputs).subscribe(value => value2 = value)
+    const s = Observable.combineLatest(...inputs).subscribe2(value => value2 = value)
 
     return ({
       next(value:T) {

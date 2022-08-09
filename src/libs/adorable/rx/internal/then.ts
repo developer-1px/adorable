@@ -1,6 +1,6 @@
 import {Observable} from "../observable/observable"
 
-export const then = <T>(resolve:(value:T) => void, reject:(reason?:any) => void) => (observable:Observable<T>):Promise<T|void> => {
+const then = <T>(resolve:(value:T) => void, reject:(reason?:any) => void) => (observable:Observable<T>):Promise<T|void> => {
   return observable.toPromise().then(value => {
     resolve(value)
     return value

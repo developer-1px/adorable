@@ -12,7 +12,7 @@ export const mergeMap = <T, R>(project:(value:T, index:number) => Asyncable<R>) 
 
   return {
     next(value:T) {
-      subscriptions.push(Observable.castAsync(project(value, index++)).subscribe(mergeMapObserver))
+      subscriptions.push(Observable.castAsync(project(value, index++)).subscribe2(mergeMapObserver))
     },
 
     complete() {

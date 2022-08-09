@@ -15,7 +15,7 @@ export const exhaustMap = <T, R>(project:(value:T, index:number) => Promise<R>|O
   return {
     next(value:T) {
       if (subscription && !subscription.closed) return
-      subscription = Observable.castAsync(project(value, index++)).subscribe(exhaustMapObserver)
+      subscription = Observable.castAsync(project(value, index++)).subscribe2(exhaustMapObserver)
     },
 
     complete() {

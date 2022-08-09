@@ -1,10 +1,10 @@
 import {Observable} from "../observable/observable"
 
 export const until = <T>(notifier:Observable<any>) => (observable:Observable<T>) => new Observable<T>(observer => {
-  const s = observable.subscribe(observer)
+  const s = observable.subscribe2(observer)
 
   const unsubscribe = () => s.unsubscribe()
-  const s2 = notifier.subscribe(unsubscribe, unsubscribe, unsubscribe)
+  const s2 = notifier.subscribe2(unsubscribe, unsubscribe, unsubscribe)
 
   return () => {
     s.unsubscribe()

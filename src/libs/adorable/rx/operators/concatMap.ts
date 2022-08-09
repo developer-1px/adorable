@@ -41,7 +41,7 @@ export const concatMap = <T, R>(project:(value:T, index:number) => Asyncable<R>)
 
         doQueue()
       })
-      .subscribe(concatMapObserver)
+      .subscribe2(concatMapObserver)
 
     subscriptions.push(subscription)
   }

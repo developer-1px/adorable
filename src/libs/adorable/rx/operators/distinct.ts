@@ -9,7 +9,7 @@ export const distinct = <T>(keySelector:(item:T) => string|number = itself, flus
 
   return {
     start() {
-      if (flushes) s = flushes.subscribe(() => (isExist = Object.create(null)))
+      if (flushes) s = flushes.subscribe2(() => (isExist = Object.create(null)))
     },
 
     next(value:T) {

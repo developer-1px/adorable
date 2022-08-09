@@ -2,6 +2,7 @@ import {__array_unique} from "../../../fp/array"
 import {BehaviorSubject, Observable} from "../../rx"
 import {itself, safe_not_equal} from "../internal"
 import type {Ref} from "../types"
+import type {Collection} from "./crud"
 import {__state__, middleware$} from "./middleware"
 
 const get = <T>(path:string, defaultValue:T):T|undefined => {
@@ -61,13 +62,13 @@ const remove = (path:string) => {
 
 const memo = Object.create(null)
 
-interface DateBaseRef<T> extends Ref<T> {
+interface DateBaseRef<T, U = T> extends Ref<T> {
   isStopPropagation:boolean
 
   remove():T
   query():T[]
-  toArray<R = T>():R[]
-  orderBy(compareFn?:(a:T, b:T) => number):Observable<T[]>
+  toArray<R = T extends Collection<U> ? U[] : T>():R[]
+  orderBy<R = T>(compareFn?:(a:R, b:R) => number):Observable<R[]>
   orderByChild(key:string):Observable<T[]>
 }
 
@@ -129,7 +130,7 @@ export function database<T = any>(path:string, defaultValue?:T|undefined):DateBa
 
     // @FIXME
     if (value instanceof Observable) {
-      r$.prev = value.subscribe(value => r$.set(value))
+      r$.prev = value.subscribe2(value => r$.set(value))
       return value
     }
 

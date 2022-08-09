@@ -2,7 +2,7 @@ import {BehaviorSubject} from "../../rx"
 import {safe_not_equal} from "../internal"
 import type {ReducerCallback, Ref} from "../types"
 import {createEffectSubscriptions} from "./createEffect"
-import {__state__, middleware$} from "./middleware"
+import {__state__} from "./middleware"
 
 const itself = <T>(value:T) => value
 const guid = (prefix = "") => prefix + Math.random().toString(36).slice(2) + "-" + Math.random().toString(36).slice(2)
@@ -24,7 +24,7 @@ export function ref<T>(value:T|undefined = undefined, path:string = guid("#")):R
     return value
   }
 
-  r$.update = (project = itself) => r$.set(project(r$.value))
+  r$.update = (project = itself<T>) => r$.set(project(r$.value))
 
   // @FIXME: 임시 log
   if (path.charAt(0) !== "#") {
