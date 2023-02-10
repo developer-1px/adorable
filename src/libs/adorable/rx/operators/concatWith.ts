@@ -7,6 +7,5 @@ declare module "../observable/observable" {
   }
 }
 
-// @ts-ignore
 // eslint-disable-next-line prefer-rest-params
 Observable.prototype.concatWith = function() {return concat(this, ...arguments)}

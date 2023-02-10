@@ -1,5 +1,5 @@
 import {__array_unique} from "../../../fp/array"
-import {BehaviorSubject, Observable} from "../../rx"
+import {BehaviorSubject, castAsync, Observable, Subscription} from "../../rx"
 import {itself, safe_not_equal} from "../internal"
 import type {Ref} from "../types"
 import type {Collection} from "./crud"
@@ -62,7 +62,17 @@ const remove = (path:string) => {
 
 const memo = Object.create(null)
 
+export interface ReadonlyDateBaseRef<T, U = T> extends Observable<T> {
+  path:string
+  value:T
+  query():T[]
+  toArray<R = T extends Collection<U> ? U[] : T>():R[]
+  orderBy<R = T>(compareFn?:(a:R, b:R) => number):Observable<R[]>
+  orderByChild(key:string):Observable<T[]>
+}
+
 interface DateBaseRef<T, U = T> extends Ref<T> {
+  prev:Subscription
   isStopPropagation:boolean
 
   remove():T
@@ -72,41 +82,66 @@ interface DateBaseRef<T, U = T> extends Ref<T> {
   orderByChild(key:string):Observable<T[]>
 }
 
-function notify(path:string, value:any) {
-  if (!memo[path]) return
+function update(path:string) {
+  if (!path || !memo[path]) return
+  const value = get(path, undefined)
   if (safe_not_equal(memo[path].value, value)) {
-    memo[path].next(value)
+    memo[path].value = value
+    return path
   }
+}
+
+function notify(path:string) {
+  memo[path].next(memo[path].value)
 }
 
 let broadcast_paths:string[] = []
 
 const broadcast = (path:string) => {
+
   // 이벤트 전파 예약
   if (broadcast_paths.length === 0) {
     Promise.resolve().then(() => {
       const update_broadcast_paths = __array_unique(broadcast_paths)
       broadcast_paths = []
-      update_broadcast_paths.forEach(path => notify(path, get(path, undefined)))
+      update_broadcast_paths.forEach(notify)
     })
   }
 
   // 이벤트 전파 (downcast)
-  Object.keys(memo).filter(p => p !== path && p.startsWith(path)).filter(Boolean).forEach(path => {
-    broadcast_paths.push(path)
+  Object.keys(memo).filter(p => p !== path && p.startsWith(path + "/")).forEach(downPath => {
+    if (update(downPath)) {
+      broadcast_paths.push(downPath)
+    }
   })
 
   // 이벤트 전파 (upcast)
   path.split("/").forEach((_, index, A) => {
     const subPath = A.slice(0, A.length - index - 1).join("/")
-    if (subPath) {
+    if (update(subPath)) {
       broadcast_paths.push(subPath)
     }
   })
 }
 
 
-export function database<T = any>(path:string, defaultValue?:T|undefined):DateBaseRef<T> {
+const transaction_queue = []
+
+export const transaction = (callback:Function) => {
+
+  const my_transaction = []
+  transaction_queue.push(my_transaction)
+  const cb = callback()
+  transaction_queue.splice(transaction_queue.indexOf(my_transaction), 1)
+
+  return castAsync(cb)
+    .toPromise()
+    .catch(() => {
+      my_transaction.forEach(([r$, value]) => r$.set(value))
+    })
+}
+
+export function database<T = unknown>(path:string, defaultValue?:T|undefined):DateBaseRef<T> {
   path = "/" + path.split("/").filter(Boolean).join("/")
 
   if (path && memo[path]) {
@@ -122,6 +157,17 @@ export function database<T = any>(path:string, defaultValue?:T|undefined):DateBa
 
   r$.set = (value:T|Observable<T>):T => {
 
+    const setAndNotify = (value:T) => {
+      if (safe_not_equal(r$.value, value)) {
+        transaction_queue[transaction_queue.length - 1]?.push([r$, r$.value])
+        set(path, value)
+        r$.next(value)
+        middleware$.next(["database", {path, value}])
+        broadcast(path)
+      }
+      return value
+    }
+
     // @FIXME
     if (r$.prev) {
       r$.prev.unsubscribe()
@@ -130,7 +176,7 @@ export function database<T = any>(path:string, defaultValue?:T|undefined):DateBa
 
     // @FIXME
     if (value instanceof Observable) {
-      r$.prev = value.subscribe2(value => r$.set(value))
+      r$.prev = value.subscribe(setAndNotify)
       return value
     }
 
@@ -139,14 +185,7 @@ export function database<T = any>(path:string, defaultValue?:T|undefined):DateBa
     // console.groupEnd()
 
     // 변경사항 전파
-    if (safe_not_equal(r$.value, value)) {
-      set(path, value)
-      r$.next(value)
-      middleware$.next(["database", {path, value}])
-      broadcast(path)
-    }
-
-    return value
+    return setAndNotify(value)
   }
   r$.update = (project = itself) => r$.set(project(r$.value))
 

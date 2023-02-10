@@ -30,6 +30,5 @@ declare module "../observable/observable" {
   }
 }
 
-// @ts-ignore
 // eslint-disable-next-line prefer-rest-params
 Observable.prototype.trace = function() {return trace(...arguments)(this)}

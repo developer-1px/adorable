@@ -2,7 +2,7 @@
 import type {Observer, Subscriber} from "../types"
 import {Observable, SubscriptionObserver} from "./observable"
 
-const noop = () => {}
+const noop = () => undefined
 
 class MulticastedObservables<T> extends Observable<T> implements Observer<T> {
   protected observers:SubscriptionObserver<T>[]|undefined = []

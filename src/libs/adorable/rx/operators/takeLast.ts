@@ -26,6 +26,5 @@ declare module "../observable/observable" {
   }
 }
 
-// @ts-ignore
 // eslint-disable-next-line prefer-rest-params
 Observable.prototype.takeLast = function() {return takeLast(...arguments)(this)}

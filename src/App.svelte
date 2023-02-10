@@ -1,7 +1,6 @@
 <script lang="ts">
-import { Observable } from "./libs/adorable"
 import "./app.css"
-import { action, run } from "./libs/adorable"
+import {action, run} from "./libs/adorable"
 
 interface Todo {
   id: string
@@ -10,12 +9,6 @@ interface Todo {
 }
 
 const _할일_추가하기 = action<Partial<Todo>>("_할일_추가하기")
-
-const todos$ = Observable.of([] as Todo[])
-
-$: todos = $todos$
-
-todos$.subscribe()
 
 const 할일추가 = () => _할일_추가하기({ title: "ssss" })
 

@@ -31,6 +31,5 @@ declare module "../observable/observable" {
   }
 }
 
-// @ts-ignore
 // eslint-disable-next-line prefer-rest-params
 Observable.prototype.distinctUntilChanged = function() {return distinct(...arguments)(this)}

@@ -39,6 +39,5 @@ declare module "../observable/observable" {
   }
 }
 
-// @ts-ignore
 // eslint-disable-next-line prefer-rest-params
 Observable.prototype.retryWhen = function() {return retryWhen(...arguments)(this)}

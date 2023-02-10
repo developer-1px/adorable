@@ -21,6 +21,5 @@ declare module "../observable/observable" {
   }
 }
 
-// @ts-ignore
 // eslint-disable-next-line prefer-rest-params
 Observable.prototype.last = function() {return last(...arguments)(this)}

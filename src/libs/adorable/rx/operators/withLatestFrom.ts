@@ -1,11 +1,11 @@
 import {lift} from "../internal/lift"
 import {Observable} from "../observable/observable"
 
-export function withLatestFrom<T>(...inputs:Observable<any>[]) {
+export function withLatestFrom<T>(...inputs:Observable<unknown>[]) {
 
-  return lift<T, any[]>(observer => {
+  return lift<T, unknown[]>(observer => {
 
-    let value2:any[]
+    let value2 = []
     const s = Observable.combineLatest(...inputs).subscribe2(value => value2 = value)
 
     return ({
@@ -31,6 +31,5 @@ declare module "../observable/observable" {
   }
 }
 
-// @ts-ignore
 // eslint-disable-next-line prefer-rest-params
 Observable.prototype.withLatestFrom = function() {return withLatestFrom(...arguments)(this)}

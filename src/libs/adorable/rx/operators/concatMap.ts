@@ -71,6 +71,5 @@ declare module "../observable/observable" {
   }
 }
 
-// @ts-ignore
 // eslint-disable-next-line prefer-rest-params
 Observable.prototype.concatMap = function() {return concatMap(...arguments)(this)}

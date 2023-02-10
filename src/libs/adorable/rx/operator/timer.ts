@@ -1,6 +1,3 @@
-// -------------------------------------------------------------------------------------------
-// Observable.timer
-// -------------------------------------------------------------------------------------------
 import {Observable} from "../observable/observable"
 
 export const timer = (initialDelay:number, period?:number) => new Observable<number>(observer => {

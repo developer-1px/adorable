@@ -14,5 +14,4 @@ declare module "../observable/observable" {
   }
 }
 
-// @ts-ignore
 Observable.fromEvent = fromEvent

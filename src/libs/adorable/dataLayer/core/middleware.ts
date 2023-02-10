@@ -5,7 +5,6 @@ export const middleware$ = new Subject()
 export const __state__ = Object.create(null)
 __state__.database = Object.create(null)
 __state__.store = Object.create(null)
-window.state = __state__
 
 export const state$ = new BehaviorSubject(__state__)
 state$.update = () => state$.next(__state__)

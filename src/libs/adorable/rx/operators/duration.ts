@@ -33,6 +33,5 @@ declare module "../observable/observable" {
   }
 }
 
-// @ts-ignore
 // eslint-disable-next-line prefer-rest-params
 Observable.prototype.duration = function() {return duration(...arguments)(this)}

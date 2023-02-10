@@ -25,5 +25,4 @@ declare module "../observable/observable" {
   }
 }
 
-// @ts-ignore
 Observable.castAsync = castAsync

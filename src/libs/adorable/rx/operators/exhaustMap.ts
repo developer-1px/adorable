@@ -38,6 +38,5 @@ declare module "../observable/observable" {
   }
 }
 
-// @ts-ignore
 // eslint-disable-next-line prefer-rest-params
 Observable.prototype.exhaustMap = function() {return exhaustMap(...arguments)(this)}

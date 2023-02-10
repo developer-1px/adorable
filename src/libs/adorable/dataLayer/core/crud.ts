@@ -1,4 +1,4 @@
-import {database} from "./database"
+import {database, type ReadonlyDateBaseRef} from "./database"
 
 export interface Collection<T> {
   [id:string|number]:T
@@ -20,7 +20,7 @@ export const INSERT = <T>(path:T, value:T) => {}
 
 export const GET = <T>(path:T) => database<T>(path.toString()).value
 
-export const SELECT = <T>(path:T, defaultValue?:T) => database<T>(path.toString(), defaultValue)
+export const SELECT = <T>(path:T, defaultValue?:T):ReadonlyDateBaseRef<T> => database<T>(path.toString(), defaultValue)
 
 export const UPDATE = <T>(path:T, defaultValue?:T) => database<T>(path.toString(), defaultValue)
 

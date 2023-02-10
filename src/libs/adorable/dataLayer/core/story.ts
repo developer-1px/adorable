@@ -1,3 +1,4 @@
+import {dispatch} from "src/libs/adorable/dataLayer/core/dispatch"
 import {adorable} from "../../adorable"
 import type {Config} from "../types"
 import {__state__} from "./middleware"
@@ -13,6 +14,11 @@ export const story = (desc:string, callback:Function):Function|Promise<Function|
 let id:number
 
 export const run = (epic:string, config:Config = {}) => {
+  if (config.dev) {
+    window.state = __state__
+    window.dispatch = dispatch
+  }
+
   if (id || hmrVersion > 1) {
     console.warn("run: ", id)
 

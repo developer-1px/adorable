@@ -3,8 +3,6 @@ export * from "./observable/subject"
 
 export * from "./internal/hostReportErrors"
 export * from "./internal/lift"
-export * from "./internal/toPromise"
-export * from "./internal/then"
 
 export * from "./operator/animationFrame"
 export * from "./operator/castAsync"
@@ -23,6 +21,7 @@ export * from "./operator/pipe"
 export * from "./operator/race"
 export * from "./operator/timer"
 export * from "./operator/throwError"
+export * from "./operator/zip"
 
 export * from "./operators/bufferCount"
 export * from "./operators/bufferTime"

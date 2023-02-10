@@ -21,6 +21,6 @@ declare module "../observable/observable" {
   }
 }
 
-// @ts-ignore
+// @ts-expect-error: TS2556
 // eslint-disable-next-line prefer-rest-params
 Observable.prototype.reject = function() {return reject(...arguments)(this)}

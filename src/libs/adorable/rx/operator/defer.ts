@@ -11,5 +11,4 @@ declare module "../observable/observable" {
   }
 }
 
-// @ts-ignore
 Observable.defer = defer

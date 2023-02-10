@@ -18,6 +18,5 @@ declare module "../observable/observable" {
   }
 }
 
-// @ts-ignore
 // eslint-disable-next-line prefer-rest-params
 Observable.prototype.count = function() {return count(...arguments)(this)}

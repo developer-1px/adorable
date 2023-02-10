@@ -43,6 +43,5 @@ declare module "../observable/observable" {
   }
 }
 
-// @ts-ignore
 // eslint-disable-next-line prefer-rest-params
 Observable.prototype.scan = function() {return scan(...arguments)(this)}

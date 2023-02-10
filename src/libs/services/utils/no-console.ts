@@ -1,5 +1,5 @@
 import {testOnly} from "../../../config"
-import {__state__} from "../dataLayer"
+import {__state__} from "src/libs/adorable/dataLayer"
 
 const noop = () => {}
 

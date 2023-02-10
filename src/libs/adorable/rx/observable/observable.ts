@@ -1,19 +1,17 @@
 import type {Observer, OnComplete, OnError, OnNext, Subscriber} from "../types"
 
-// @ts-ignore
 if (!Symbol.observable) Object.defineProperty(Symbol, "observable", {value: Symbol("@@observable")})
 
-function cleanupSubscription(subscription:Subscription) {
+function cleanupSubscription<T>(subscription:Subscription<T>) {
   const {cleanup} = subscription
-  // @ts-ignore
   delete subscription.observer
   delete subscription.cleanup
   if (cleanup) cleanup()
 }
 
 export class SubscriptionObserver<T> implements Observer<T> {
-  // eslint-disable-next-line no-useless-constructor
-  constructor(private subscription:Subscription) {}
+
+  constructor(private subscription:Subscription<T>) {}
 
   get closed() {return this.subscription.closed}
 
@@ -52,10 +50,10 @@ export class SubscriptionObserver<T> implements Observer<T> {
 }
 
 
-export class Subscription {
-  cleanup:Function|undefined
+export class Subscription<T> {
+  cleanup:() => void
 
-  constructor(public observer:Observer<any>, subscriber:Subscriber<any>) {
+  constructor(public observer:Observer<T>, subscriber:Subscriber<T>) {
     observer.start && observer.start(this)
     if (this.closed) {
       return
@@ -91,39 +89,60 @@ export class Subscription {
   }
 }
 
-export class Observable<T = any> {
+export class Observable<T = unknown> implements PromiseLike<T> {
+
   constructor(private subscriber:Subscriber<T>) {
     if (typeof subscriber !== "function") {
       throw new TypeError("Observable initializer must be a function.")
     }
   }
 
-  subscribe(next?:OnNext<T>, error?:OnError, complete?:OnComplete):Subscription {
+  subscribe(next?:OnNext<T>, error?:OnError, complete?:OnComplete) {
+    if (typeof next === "object") this.subscribe2(next)
     return this.subscribe2({next, error, complete})
   }
 
-  subscribe2(observer:Observer<T>):Subscription
-  subscribe2(next?:OnNext<T>, error?:OnError, complete?:OnComplete):Subscription
-  subscribe2(observer?:Observer<T>|OnNext<T>, error?:OnError, complete?:OnComplete):Subscription {
+  subscribe2(observer:Observer<T>):Subscription<T>
+  subscribe2(next?:OnNext<T>, error?:OnError, complete?:OnComplete):Subscription<T>
+  subscribe2(observer?:Observer<T>|OnNext<T>, error?:OnError, complete?:OnComplete):Subscription<T> {
     if (typeof observer === "function") observer = {next: observer, error, complete}
     else if (typeof observer !== "object") observer = {}
     return new Subscription(observer, this.subscriber)
   }
 
-  // @ts-ignore
+  toPromise() {
+    return new Promise<T>((resolve, reject) => {
+      let s = null
+      s = this.subscribe(
+        (value) => {
+          resolve(value)
+          s && s.unsubscribe()
+        },
+        (error) => reject(error)
+      )
+    })
+  }
+
+  then<TResult1 = T, TResult2 = never>(onfulfilled?:((value:T) => TResult1|PromiseLike<TResult1>)|undefined|null, onrejected?:((reason:unknown) => TResult2|PromiseLike<TResult2>)|undefined|null):Promise<TResult1|TResult2> {
+    return this.toPromise().then(onfulfilled, onrejected)
+  }
+
   [Symbol.observable]() {
     return this
   }
 
-  static from(x:any):Observable {
+  static from(x:unknown):Observable {
     if (Object(x) !== x) {
       throw new TypeError(x + " is not an object")
     }
 
     const Cls = (typeof this === "function") ? this : Observable
 
+    if (typeof x.subscribe === "function") {
+      return new Cls(observer => x.subscribe(observer))
+    }
+
     // observable
-    // @ts-ignore
     let method = x[Symbol.observable]
     if (method) {
       const observable = method.call(x)
@@ -143,7 +162,6 @@ export class Observable<T = any> {
     // iterable
     method = x[Symbol.iterator]
     if (method) {
-      // @ts-ignore
       return new Cls(observer => {
         for (const item of method.call(x)) {
           observer.next(item)
@@ -161,7 +179,6 @@ export class Observable<T = any> {
   static of<T>(...items:T[]):Observable<T> {
     const Cls = typeof this === "function" ? this : Observable
 
-    // @ts-ignore
     return new Cls(observer => {
       for (const item of items) {
         observer.next(item)

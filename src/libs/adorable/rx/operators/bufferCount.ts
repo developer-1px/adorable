@@ -25,6 +25,6 @@ declare module "../observable/observable" {
   }
 }
 
-// @ts-ignore
-// eslint-disable-next-line prefer-rest-params
-Observable.prototype.bufferCount = function() {return bufferCount(...arguments)(this)}
+Observable.prototype.bufferCount = function(bufferSize:number, startBufferEvery:number) {
+  return bufferCount(bufferSize,startBufferEvery)(this)
+}

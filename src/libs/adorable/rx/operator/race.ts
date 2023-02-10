@@ -1,7 +1,7 @@
 import {Observable, Subscription} from "../observable/observable"
 
 export const race = <T>(...observables:Observable<T>[]) => new Observable<T>(observer => {
-  const subscriptions:Subscription[] = []
+  const subscriptions:Subscription<T>[] = []
   let hasWinner = false
 
   const createRaceObserver = (index:number) => Object.setPrototypeOf({

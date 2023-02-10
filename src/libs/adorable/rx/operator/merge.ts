@@ -19,7 +19,6 @@ export const merge = <T>(...observables:Observable<T>[]) => new Observable<T>(ob
   }
 })
 
-
 declare module "../observable/observable" {
   namespace Observable {
     export function merge<T>(...observables:Observable<T>[]):Observable<T>

@@ -17,6 +17,5 @@ declare module "../observable/observable" {
   }
 }
 
-// @ts-ignore
 // eslint-disable-next-line prefer-rest-params
 Observable.prototype.takeUntil = function() {return takeUntil(...arguments)(this)}
