@@ -9,7 +9,7 @@ export const __decodeHTML = (html:string) => {
 
 export const stricmp = (a:string|number, b:string|number) => String(a ?? "").localeCompare(String(b ?? ""))
 
-export const autolink = (str:string, attr = "", callback = (_url:string) => "") => {
-  const pattern = /(^|[\s\n]|<[A-Za-z]*\/?>)((?:https?|ftp):\/\/[-A-Z0-9+\u0026\u2019@#/%?=()~_|!:,.;]*[-A-Z0-9+\u0026@#/%=~()_|])/gi
-  return str.replace(pattern, (_, space:string, url:string) => space + `<a href="${url}" ${attr}>${callback(url)}</a>`)
+export const autolink = (str:string, attrs:string, url_filter = (url:string) => url) => {
+  const link = (url:string) => `<a href="${url_filter(url)}" ${attrs}>${url}</a>`
+  return str.replace(/(https?:\/\/[^\s]+)/g, link)
 }

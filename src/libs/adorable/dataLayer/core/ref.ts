@@ -42,8 +42,11 @@ export function ref<T>(value:T|undefined = undefined, path:string = guid("#")):R
   return memo[path] = r$
 }
 
+type ToStringable<T> = T extends { toString(): string } ? T : never;
 
-export function reducer<T>(value:T|undefined, path:string, callback:ReducerCallback<T>):Ref<T> {
+export function reducer<T>(value:T|undefined, path:string|ToStringable, callback:ReducerCallback<T>):Ref<T> {
+
+  path = path.toString()
 
   if (memoSubscriptions[path]) {
     for (const s of memoSubscriptions[path]) s.unsubscribe()

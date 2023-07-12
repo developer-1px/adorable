@@ -5,7 +5,7 @@ interface RequestInitEx extends RequestInit {
   url?:string
   query?:any
   bodyParser?:(req:any, options:RequestInitEx) => any
-  response?:(res:Response) => any
+  response?:(res:Response) => Object
   onBeforeSend?:Function
   catchError?:Function
   preScript?:Function
@@ -22,11 +22,14 @@ export const uri = (stings:TemplateStringsArray, ...keys:any[]) => {
   return result
 }
 
+let touched = false
+if (typeof window !== "undefined") {
+  window.addEventListener("touchstart", () => {touched = true}, true)
+  window.addEventListener("touchcancel", () => {touched = false}, true)
+  window.addEventListener("ontouchend", () => {touched = false}, true)
+}
+
 export const form_urlencode = (object:Record<string, string>) => Object.entries(object).filter(([key, value]) => key && (value !== null && value !== undefined)).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join("&")
-
-export interface HttpService {}
-
-export type HttpServiceCallback<T> = (http:HttpService) => Promise<T>
 
 export class HttpService {
   private readonly init:RequestInitEx
@@ -82,7 +85,6 @@ export class HttpService {
 
   query<T>(query:T) {return this.request({query})}
 
-  // @ts-ignore
   body<T>(body:T) {return this.request({body})}
 
   /// Request -> Response
@@ -116,37 +118,34 @@ export class HttpService {
 
     const response = init.response || ((res:Response) => res.text())
 
-    const method = (init.method ?? "get").toLowerCase()
-
     return new Observable<T>(observer => {
       if (init.onBeforeSend) {
         init.onBeforeSend(init)
       }
 
       /// @FIXME: MOCK UP / SUCCESS / FAILURE 분기 처리
-      const request = fetch(url, init)
-        .then(async (res) => {
-          const {ok, status, url} = res
-          const data = await response(res)
+      const request = new Promise((resolve, reject) => {
 
-          // @FIMX: 304 로컬캐시 기능은 고민할 거리가 많아 보류함.
+        const req = () => fetch(url, init)
+          .then(async (res) => {
+            const {ok, status, url} = res
+            const data = await response(res)
 
-          // const key = init.cacheKey ?? url
-          // if (method === "get" && status === 304) {
-          //   console.warn("cache304", res, method, url, cache304, cache304[method + " " + key])
-          //   return cache304[method + " " + key]
-          // }
+            if (status !== 304 && !ok) {
+              throw init.catchError ? (init.catchError(data) ?? data) : data
+            }
 
-          if (status !== 304 && !ok) {
-            throw init.catchError ? (init.catchError(data) ?? data) : data
-          }
+            return data
+          })
+          .then(resolve, reject)
 
-          // if (method === "get") {
-          //   cache304[method + " " + key] = await data
-          // }
-
-          return data
-        })
+        if (touched) {
+          setTimeout(req, 500)
+        }
+        else {
+          req()
+        }
+      })
 
       return Observable.castAsync<T>(request)
         .initialize(() => dispatch(init.method + " " + url + ".REQUEST", body))
@@ -156,6 +155,13 @@ export class HttpService {
         )
         .subscribe2(observer)
     })
+  }
+
+  static json() {
+    return (new HttpService())
+      .header("Content-Type", "application/json")
+      .bodyParser(body => JSON.stringify(body))
+      .response(res => res.json())
   }
 }
 

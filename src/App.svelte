@@ -1,49 +1,69 @@
 <script lang="ts">
 import "./app.css"
-import {action, run} from "./libs/adorable"
+import {action, createStore, on, reducer, run, UPDATE} from "./libs/adorable"
+import type {Collection} from "./libs/adorable/index.js"
+import {dispatch} from "./libs/adorable/index.js"
 
 interface Todo {
-  id: string
-  title: string
-  isDone: boolean
+  id:string
+  title:string
+  isDone:boolean
 }
+
+interface State {
+  todos:Collection<Todo>
+}
+
+const store = createStore<State>("store")
+
 
 const _할일_추가하기 = action<Partial<Todo>>("_할일_추가하기")
 
-const 할일추가 = () => _할일_추가하기({ title: "ssss" })
+const 할일추가 = () => dispatch(_할일_추가하기({title: "ssss"}))
 
-run("", { dev: true })
+
+const todos$ = reducer([], store.todos, todos$ => {
+
+  on(_할일_추가하기)
+    .tap((params) => {
+      const id = Math.random().toString(36).substr(2, 9)
+      UPDATE(store.todos[id]).set({id, ...params, isDone: false})
+    })
+    .createEffect()
+})
+
+run("", {dev: true})
 </script>
 
-<button on:click={할일추가} />
+<button on:click={할일추가}>할일 추가하기</button>
 
 <section class="todoapp">
   <header class="header">
     <h1>todos</h1>
-    <input class="new-todo" placeholder="What needs to be done?" autofocus />
+    <input class="new-todo" placeholder="What needs to be done?" autofocus/>
   </header>
   <!-- This section should be hidden by default and shown when there are todos -->
   <section class="main">
-    <input id="toggle-all" class="toggle-all" type="checkbox" />
+    <input id="toggle-all" class="toggle-all" type="checkbox"/>
     <label for="toggle-all">Mark all as complete</label>
     <ul class="todo-list">
       <!-- These are here just to show the structure of the list items -->
       <!-- List items should get the class `editing` when editing and `completed` when marked as completed -->
       <li class="completed">
         <div class="view">
-          <input class="toggle" type="checkbox" checked />
+          <input class="toggle" type="checkbox" checked/>
           <label>Taste JavaScript</label>
-          <button class="destroy" />
+          <button class="destroy"/>
         </div>
-        <input class="edit" value="Create a TodoMVC template" />
+        <input class="edit" value="Create a TodoMVC template"/>
       </li>
       <li>
         <div class="view">
-          <input class="toggle" type="checkbox" />
+          <input class="toggle" type="checkbox"/>
           <label>Buy a unicorn</label>
-          <button class="destroy" />
+          <button class="destroy"/>
         </div>
-        <input class="edit" value="Rule the web" />
+        <input class="edit" value="Rule the web"/>
       </li>
     </ul>
   </section>

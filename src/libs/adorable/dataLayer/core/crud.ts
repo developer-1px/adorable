@@ -1,7 +1,7 @@
 import {database, type ReadonlyDateBaseRef} from "./database"
 
 export interface Collection<T> {
-  [id:string|number]:T
+  readonly [id:string|number]:T
 }
 
 // @ts-ignore

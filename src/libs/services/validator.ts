@@ -1575,10 +1575,7 @@ const tld = [
   "zm",
   "zone",
   "zuerich",
-  "zw"
-]
-
-const second_domain = [
+  "zw",
   "ad",
   "ag",
   "ai",
@@ -1696,19 +1693,6 @@ const second_domain = [
   "zw",
 ]
 
-const EMAIL_DOMAINS = [
-  "com",
-  "net",
-  "co.kr",
-  "kr"
-]
-
 const re_email = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 
-export const validateEmail = (email:string) => {
-  const res = email.match(re_email)
-  if (!res) return false
-  const domain:string = res[5] ?? ""
-  const domains = domain.split(".").slice(-1)
-  return EMAIL_DOMAINS.includes(domains[0])
-}
+export const validateEmail = (email:string) => email.match(re_email)

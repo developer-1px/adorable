@@ -18,7 +18,7 @@ export const __array_unique = <T>(array:T[], callback:((item:T) => any) = (item:
 
   array.forEach(item => {
     const key = callback(item)
-    if (!check[key]) {
+    if (key !== null && key !== undefined && !check[key]) {
       check[key] = true
       result.push(item)
     }
@@ -38,12 +38,11 @@ export const __array_group_by = <T>(array:T[], makeKeyCallback:((item:T) => stri
   return groupBy
 }
 
-export const toRecord = <T>(arr:T[], makeKey = (t:T) => String(t)) => {
+export const toCollection = <T>(arr:T[], makeKey = (t:T) => String(t)) => {
   const obj:Record<string, T> = Object.create(null)
-  arr.forEach(value => (obj[makeKey(value)] = value))
+  ;(arr ?? []).forEach(value => (obj[makeKey(value)] = value))
   return obj
 }
-
 
 export const array_unique = <T>(callback:((item:T) => any) = (item:T) => item) => (array:T[]):T[] => {
   const check = Object.create(null)
@@ -51,7 +50,7 @@ export const array_unique = <T>(callback:((item:T) => any) = (item:T) => item) =
 
   array.forEach(item => {
     const key = callback(item)
-    if (!check[key]) {
+    if (key !== undefined && key !== null && !check[key]) {
       check[key] = true
       result.push(item)
     }

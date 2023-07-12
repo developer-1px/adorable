@@ -1,4 +1,3 @@
-import {__array_unique} from "../../../fp/array"
 import {BehaviorSubject, castAsync, Observable, Subscription} from "../../rx"
 import {itself, safe_not_equal} from "../internal"
 import type {Ref} from "../types"
@@ -83,7 +82,10 @@ interface DateBaseRef<T, U = T> extends Ref<T> {
 }
 
 function update(path:string) {
-  if (!path || !memo[path]) return
+  if (!path || !memo[path]) {
+    return
+  }
+
   const value = get(path, undefined)
   if (safe_not_equal(memo[path].value, value)) {
     memo[path].value = value
@@ -95,15 +97,15 @@ function notify(path:string) {
   memo[path].next(memo[path].value)
 }
 
-let broadcast_paths:string[] = []
+const broadcast_paths = new Set<string>
 
 const broadcast = (path:string) => {
 
   // 이벤트 전파 예약
-  if (broadcast_paths.length === 0) {
+  if (broadcast_paths.size === 0) {
     Promise.resolve().then(() => {
-      const update_broadcast_paths = __array_unique(broadcast_paths)
-      broadcast_paths = []
+      const update_broadcast_paths = [...broadcast_paths]
+      broadcast_paths.clear()
       update_broadcast_paths.forEach(notify)
     })
   }
@@ -111,7 +113,7 @@ const broadcast = (path:string) => {
   // 이벤트 전파 (downcast)
   Object.keys(memo).filter(p => p !== path && p.startsWith(path + "/")).forEach(downPath => {
     if (update(downPath)) {
-      broadcast_paths.push(downPath)
+      broadcast_paths.add(downPath)
     }
   })
 
@@ -119,7 +121,7 @@ const broadcast = (path:string) => {
   path.split("/").forEach((_, index, A) => {
     const subPath = A.slice(0, A.length - index - 1).join("/")
     if (update(subPath)) {
-      broadcast_paths.push(subPath)
+      broadcast_paths.add(subPath)
     }
   })
 }
@@ -127,7 +129,7 @@ const broadcast = (path:string) => {
 
 const transaction_queue = []
 
-export const transaction = (callback:Function) => {
+export const transaction = (callback:() => unknown) => {
 
   const my_transaction = []
   transaction_queue.push(my_transaction)
