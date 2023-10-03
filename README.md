@@ -23,10 +23,10 @@ Redux와 RxJs는 현재 점유율을 잃어 가고 있는 상황이지만 그 �
 현재는 XState와 같은 유한 상태기계나 Recoil등의 family등의 최신 패러다임까지 흡수해 1) 상태관리 2) 비동기 3) 반응형 프로그래밍 4) 상태머신이라는 새로운 화두듣을 쉽게 사용할 수 있도록 패키지
 해 나갈 예정입니다.
 
-## What is direffent?
+## What is different?
 
 - Rxjs: Pipe method vs DotChain vs Pipeline operator (TBD)
-- Redux: Why Reducer? Why Redux is verbose? What is benefit using Redux?
+- Redux: Why Reducer? Why Redux is verbose? What are the benefits of using Redux?
 - Props Drill, Context API
 
 ## Read more (TBD)
@@ -36,7 +36,7 @@ Redux와 RxJs는 현재 점유율을 잃어 가고 있는 상황이지만 그 �
 
 ## Goals
 
-> Write less, Do More!
+> Write Less, Do More!
 
 ---
 
